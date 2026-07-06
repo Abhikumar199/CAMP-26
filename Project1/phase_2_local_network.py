@@ -5,7 +5,11 @@ Validate traveling-wave propagation on the
 regular nearest-neighbor ring at p = 0.
 """
 
-import os
+from pathlib import Path
+
+import matplotlib
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 
 from network import (
@@ -16,7 +20,22 @@ from network import (
 from simulator import run_simulation
 
 
-os.makedirs("figures", exist_ok=True)
+# ============================================
+# PATH SETUP
+# ============================================
+
+PROJECT_DIR = Path(__file__).resolve().parent
+FIGURE_DIR = PROJECT_DIR / "figures"
+
+FIGURE_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+print("Project directory:", PROJECT_DIR)
+print("Figure directory:", FIGURE_DIR)
+
+
 
 
 # --------------------------------------------
@@ -83,30 +102,39 @@ print(
 )
 
 
-# --------------------------------------------
-# Raster plot
-# --------------------------------------------
+# ============================================
+# RASTER PLOT — DEBUG VERSION
+# ============================================
+
+print("DEBUG 1: Starting plot")
 
 plt.figure(figsize=(10, 6))
+
+print("DEBUG 2: Figure created")
 
 plt.scatter(
     spike_times,
     spike_neurons,
-    s=8,
+    s=12
 )
+
+print("DEBUG 3: Scatter created")
 
 plt.xlabel("Time")
 plt.ylabel("Neuron index")
+plt.title("Phase 2: Traveling Waves in Local Ring Network (p = 0)")
 
-plt.title(
-    "Phase 2: Traveling Waves on Local Ring (p = 0)"
-)
+output_file = FIGURE_DIR / "phase2_local_wave_raster.png"
 
-plt.tight_layout()
+print("DEBUG 4: About to save")
+print("Output path:", output_file)
 
 plt.savefig(
-    "figures/phase2_local_wave_raster.png",
-    dpi=300,
+    output_file,
+    dpi=150
 )
 
-plt.show()
+print("DEBUG 5: Save finished")
+print("Figure exists:", output_file.exists())
+
+plt.close()
