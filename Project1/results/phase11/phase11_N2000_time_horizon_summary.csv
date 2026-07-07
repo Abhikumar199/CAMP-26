@@ -1,0 +1,5 @@
+p,number_of_shortcuts,realizations,active_at_end,died_early,mean_last_spike_time,min_last_spike_time,max_last_spike_time,mean_total_spikes,mean_runtime_seconds
+0.0,0,5,0,5,1010.0,1010.0,1010.0,2000.0,3.6794476200127972
+0.0005,1,5,3,2,2140.0,793.0,3000.0,17624.0,3.606306239985861
+0.001,2,5,5,0,3000.0,3000.0,3000.0,29853.0,3.6265214200364424
+0.002,4,5,4,1,2484.8,424.0,3000.0,26746.4,3.614492439990863
