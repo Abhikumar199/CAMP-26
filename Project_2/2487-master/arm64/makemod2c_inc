@@ -1,0 +1,56 @@
+cadecay.cpp: .././cadecay.mod $(NOCMODL)
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../.";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "cadecay.mod"  -o "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64" )
+
+./cadecay.o: cadecay.cpp
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) /Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<\\n"
+	$(CXXCOMPILE) -I"../." $(INCLUDES) -fPIC -c "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<" -o $@
+
+kA.cpp: .././kA.mod $(NOCMODL)
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../.";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "kA.mod"  -o "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64" )
+
+./kA.o: kA.cpp
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) /Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<\\n"
+	$(CXXCOMPILE) -I"../." $(INCLUDES) -fPIC -c "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<" -o $@
+
+kca3.cpp: .././kca3.mod $(NOCMODL)
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../.";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "kca3.mod"  -o "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64" )
+
+./kca3.o: kca3.cpp
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) /Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<\\n"
+	$(CXXCOMPILE) -I"../." $(INCLUDES) -fPIC -c "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<" -o $@
+
+kfasttab.cpp: .././kfasttab.mod $(NOCMODL)
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../.";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "kfasttab.mod"  -o "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64" )
+
+./kfasttab.o: kfasttab.cpp
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) /Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<\\n"
+	$(CXXCOMPILE) -I"../." $(INCLUDES) -fPIC -c "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<" -o $@
+
+kslowtab.cpp: .././kslowtab.mod $(NOCMODL)
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../.";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "kslowtab.mod"  -o "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64" )
+
+./kslowtab.o: kslowtab.cpp
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) /Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<\\n"
+	$(CXXCOMPILE) -I"../." $(INCLUDES) -fPIC -c "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<" -o $@
+
+lcafixed.cpp: .././lcafixed.mod $(NOCMODL)
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../.";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "lcafixed.mod"  -o "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64" )
+
+./lcafixed.o: lcafixed.cpp
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) /Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<\\n"
+	$(CXXCOMPILE) -I"../." $(INCLUDES) -fPIC -c "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<" -o $@
+
+nafast.cpp: .././nafast.mod $(NOCMODL)
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../.";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "nafast.mod"  -o "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64" )
+
+./nafast.o: nafast.cpp
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) /Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<\\n"
+	$(CXXCOMPILE) -I"../." $(INCLUDES) -fPIC -c "/Users/shraddhapathak/Downloads/Neuron26-main/2487-master/arm64/$<" -o $@
+
