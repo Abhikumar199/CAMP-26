@@ -34,11 +34,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================================
-# PATH SETUP
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 
 FIGURE_DIR = (
@@ -52,17 +47,11 @@ FIGURE_DIR.mkdir(
     exist_ok=True,
 )
 
-
-# ============================================================
-# MODEL PARAMETERS
-# ============================================================
-
 N = 100
 
 P = 0.1
 
 SEED = 3
-
 
 I_EXT = 0.85
 
@@ -72,24 +61,13 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 
 T_MAX = 200.0
 
-
 STIMULUS_NEURON = N // 2
 
 STIMULUS_TIME = 10.0
-
-
-# ============================================================
-# CLASSIFICATION PARAMETERS
-# ============================================================
 
 """
 We classify activity using a final observation window.
@@ -112,11 +90,6 @@ If no:
 
 FINAL_WINDOW = 20.0
 
-
-# ============================================================
-# PERSISTENCE CLASSIFIER
-# ============================================================
-
 def classify_persistent_activity(
     spike_times,
     stimulus_time,
@@ -128,11 +101,6 @@ def classify_persistent_activity(
         spike_times,
         dtype=float,
     )
-
-
-    # --------------------------------------------------------
-    # CASE 1 — NO SPIKES
-    # --------------------------------------------------------
 
     if len(spike_times) == 0:
 
@@ -150,19 +118,9 @@ def classify_persistent_activity(
             "spikes_in_final_window": 0,
         }
 
-
-    # --------------------------------------------------------
-    # LAST SPIKE
-    # --------------------------------------------------------
-
     last_spike_time = float(
         spike_times[-1]
     )
-
-
-    # --------------------------------------------------------
-    # ACTIVITY DURATION
-    # --------------------------------------------------------
 
     persistence_duration = max(
 
@@ -172,17 +130,11 @@ def classify_persistent_activity(
         - stimulus_time
     )
 
-
-    # --------------------------------------------------------
-    # FINAL OBSERVATION WINDOW
-    # --------------------------------------------------------
-
     final_window_start = (
 
         t_max
         - final_window
     )
-
 
     spikes_in_final_window = np.sum(
 
@@ -190,17 +142,11 @@ def classify_persistent_activity(
         >= final_window_start
     )
 
-
-    # --------------------------------------------------------
-    # SUCCESS / FAILURE
-    # --------------------------------------------------------
-
     persistent = (
 
         spikes_in_final_window
         > 0
     )
-
 
     if persistent:
 
@@ -209,11 +155,6 @@ def classify_persistent_activity(
     else:
 
         status = "FAILURE"
-
-
-    # --------------------------------------------------------
-    # RETURN RESULTS
-    # --------------------------------------------------------
 
     return {
         "status": status,
@@ -231,26 +172,15 @@ def classify_persistent_activity(
         ),
     }
 
-
-# ============================================================
-# STEP 1 — BUILD LOCAL RING
-# ============================================================
-
 print("=" * 60)
 
 print("PHASE 4: PERSISTENT ACTIVITY CLASSIFIER")
 
 print("=" * 60)
 
-
 local_network = build_ring_network(
     N
 )
-
-
-# ============================================================
-# STEP 2 — ADD RANDOM SHORTCUTS
-# ============================================================
 
 small_world_network, shortcuts = (
     add_random_shortcuts(
@@ -262,7 +192,6 @@ small_world_network, shortcuts = (
         seed=SEED,
     )
 )
-
 
 print("\nNETWORK")
 
@@ -278,11 +207,6 @@ print(
     "Number of shortcuts:",
     len(shortcuts),
 )
-
-
-# ============================================================
-# STEP 3 — SINGLE INPUT AND SIMULATION
-# ============================================================
 
 spike_times, spike_neurons = run_simulation(
 
@@ -305,7 +229,6 @@ spike_times, spike_neurons = run_simulation(
     stimulus_time=STIMULUS_TIME,
 )
 
-
 spike_times = np.asarray(
     spike_times,
     dtype=float,
@@ -315,11 +238,6 @@ spike_neurons = np.asarray(
     spike_neurons,
     dtype=int,
 )
-
-
-# ============================================================
-# STEP 4 — CLASSIFY THE SIMULATION
-# ============================================================
 
 result = classify_persistent_activity(
 
@@ -332,66 +250,48 @@ result = classify_persistent_activity(
     final_window=FINAL_WINDOW,
 )
 
-
-# ============================================================
-# STEP 5 — PRINT RESULTS
-# ============================================================
-
 print("\nCLASSIFICATION RESULTS")
 
 print("-" * 40)
-
 
 print(
     "Status:",
     result["status"],
 )
 
-
 print(
     "Persistent:",
     result["persistent"],
 )
-
 
 print(
     "Total spikes:",
     result["total_spikes"],
 )
 
-
 print(
     "Last spike time:",
     result["last_spike_time"],
 )
-
 
 print(
     "Persistence duration:",
     result["persistence_duration"],
 )
 
-
 print(
     "Spikes in final window:",
     result["spikes_in_final_window"],
 )
-
 
 print(
     "Final window:",
     f"{T_MAX - FINAL_WINDOW} to {T_MAX}",
 )
 
-
-# ============================================================
-# STEP 6 — EXPLAIN THE DECISION
-# ============================================================
-
 print("\nDECISION")
 
 print("-" * 40)
-
 
 if result["persistent"]:
 
@@ -415,15 +315,9 @@ else:
         "the final observation window."
     )
 
-
-# ============================================================
-# STEP 7 — RASTER PLOT
-# ============================================================
-
 plt.figure(
     figsize=(12, 6)
 )
-
 
 plt.scatter(
 
@@ -434,9 +328,6 @@ plt.scatter(
     s=8,
 )
 
-
-# Mark beginning of final observation window
-
 plt.axvline(
 
     T_MAX - FINAL_WINDOW,
@@ -446,16 +337,13 @@ plt.axvline(
     label="Final observation window",
 )
 
-
 plt.xlabel(
     "Time"
 )
 
-
 plt.ylabel(
     "Neuron index"
 )
-
 
 plt.title(
 
@@ -466,22 +354,14 @@ plt.title(
     f"Result = {result['status']}"
 )
 
-
 plt.xlim(
     0,
     T_MAX,
 )
 
-
 plt.legend()
 
-
 plt.tight_layout()
-
-
-# ============================================================
-# SAVE FIGURE
-# ============================================================
 
 output_file = (
 
@@ -490,7 +370,6 @@ output_file = (
     / f"seed_{SEED}_"
       f"{result['status'].lower()}.png"
 )
-
 
 plt.savefig(
 
@@ -501,18 +380,11 @@ plt.savefig(
     bbox_inches="tight",
 )
 
-
 plt.close()
-
 
 print("\nFigure saved to:")
 
 print(output_file)
-
-
-# ============================================================
-# PHASE COMPLETE
-# ============================================================
 
 print("\n" + "=" * 60)
 
@@ -520,23 +392,12 @@ print("PHASE 4 COMPLETE")
 
 print("=" * 60)
 
-
-
-
-# Added new 
-
-
-# ============================================================
-# PHASE 4 — VALIDATE CLASSIFIER ACROSS REALIZATIONS
-# ============================================================
-
 N_REALIZATIONS = 20
 
 results = []
 
 success_count = 0
 failure_count = 0
-
 
 print("=" * 80)
 print("PHASE 4: VALIDATING PERSISTENT ACTIVITY CLASSIFIER")
@@ -565,29 +426,14 @@ print(
     N_REALIZATIONS,
 )
 
-
-# ============================================================
-# RUN DIFFERENT NETWORK REALIZATIONS
-# ============================================================
-
 print("\n")
 print("=" * 80)
 print("RUNNING REALIZATIONS")
 print("=" * 80)
 
-
 for seed in range(N_REALIZATIONS):
 
-    # --------------------------------------------------------
-    # 1. Build the local ring
-    # --------------------------------------------------------
-
     local_network = build_ring_network(N)
-
-
-    # --------------------------------------------------------
-    # 2. Add random shortcuts
-    # --------------------------------------------------------
 
     small_world_network, shortcuts = (
         add_random_shortcuts(
@@ -596,11 +442,6 @@ for seed in range(N_REALIZATIONS):
             seed=seed,
         )
     )
-
-
-    # --------------------------------------------------------
-    # 3. Apply one stimulus and simulate
-    # --------------------------------------------------------
 
     spike_times, spike_neurons = run_simulation(
         outgoing_connections=small_world_network,
@@ -614,22 +455,12 @@ for seed in range(N_REALIZATIONS):
         stimulus_time=STIMULUS_TIME,
     )
 
-
-    # --------------------------------------------------------
-    # 4. Classify automatically
-    # --------------------------------------------------------
-
     result = classify_persistent_activity(
         spike_times=spike_times,
         stimulus_time=STIMULUS_TIME,
         t_max=T_MAX,
         final_window=FINAL_WINDOW,
     )
-
-
-    # --------------------------------------------------------
-    # 5. Count outcome
-    # --------------------------------------------------------
 
     if result["persistent"]:
 
@@ -638,11 +469,6 @@ for seed in range(N_REALIZATIONS):
     else:
 
         failure_count += 1
-
-
-    # --------------------------------------------------------
-    # 6. Store result
-    # --------------------------------------------------------
 
     results.append({
 
@@ -663,11 +489,6 @@ for seed in range(N_REALIZATIONS):
             result["spikes_in_final_window"],
     })
 
-
-    # --------------------------------------------------------
-    # 7. Print one-line result
-    # --------------------------------------------------------
-
     print(
 
         f"Seed {seed:2d} | "
@@ -687,11 +508,6 @@ for seed in range(N_REALIZATIONS):
         f"{result['spikes_in_final_window']:4d}"
     )
 
-
-# ============================================================
-# SUMMARY
-# ============================================================
-
 success_probability = (
     success_count
     / N_REALIZATIONS
@@ -701,7 +517,6 @@ failure_probability = (
     failure_count
     / N_REALIZATIONS
 )
-
 
 print("\n")
 print("=" * 80)
@@ -733,11 +548,6 @@ print(
     failure_probability,
 )
 
-
-# ============================================================
-# LIST SUCCESS AND FAILURE SEEDS
-# ============================================================
-
 success_seeds = [
 
     result["seed"]
@@ -746,7 +556,6 @@ success_seeds = [
 
     if result["status"] == "SUCCESS"
 ]
-
 
 failure_seeds = [
 
@@ -757,13 +566,11 @@ failure_seeds = [
     if result["status"] == "FAILURE"
 ]
 
-
 print("\nSUCCESS SEEDS")
 
 print("-" * 50)
 
 print(success_seeds)
-
 
 print("\nFAILURE SEEDS")
 
@@ -771,16 +578,10 @@ print("-" * 50)
 
 print(failure_seeds)
 
-
-# ============================================================
-# FINAL CHECK
-# ============================================================
-
 print("\n")
 print("=" * 80)
 print("TASK (e) RESULT")
 print("=" * 80)
-
 
 if success_count > 0 and failure_count > 0:
 
