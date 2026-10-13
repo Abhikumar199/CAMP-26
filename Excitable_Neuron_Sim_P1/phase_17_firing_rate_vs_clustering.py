@@ -1,35 +1,4 @@
-"""
-phase_17_firing_rate_vs_clustering_curve.py
 
-FIXED:
-    N = 1000
-
-QUESTION:
-    How does mean whole-network firing rate vary
-    with the clustering coefficient?
-
-For every shortcut density p:
-
-    1. Generate multiple random networks.
-    2. Calculate clustering coefficient using:
-
-           C_i = 2 e_i / [k_i (k_i - 1)]
-
-    3. Average over all neurons:
-
-           C = (1/N) sum_i C_i
-
-    4. Run neuron simulation.
-    5. Calculate whole-network mean firing rate.
-    6. Average across random realizations.
-
-FINAL PLOT:
-
-    x-axis = Mean clustering coefficient C
-    y-axis = Mean whole-network firing rate
-
-    One connected curve.
-"""
 
 
 from pathlib import Path
@@ -46,9 +15,6 @@ from network import (
 from simulator import run_simulation
 
 
-# ============================================================
-# PATHS
-# ============================================================
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
@@ -76,16 +42,12 @@ FIGURE_FILE = (
 )
 
 
-# ============================================================
-# FIXED NETWORK SIZE
-# ============================================================
+
 
 N = 1000
 
 
-# ============================================================
-# SHORTCUT DENSITIES
-# ============================================================
+
 
 P_VALUES = [
 
@@ -110,9 +72,6 @@ P_VALUES = [
 ]
 
 
-# ============================================================
-# NUMBER OF RANDOM NETWORKS PER p
-# ============================================================
 
 # Start with 3 for testing.
 # Later use 10 or 20.
@@ -120,9 +79,7 @@ P_VALUES = [
 NUM_REALIZATIONS = 3
 
 
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
+
 
 I_EXT = 0.85
 
@@ -133,9 +90,6 @@ TAU_M = 10.0
 TAU_D = 1.0
 
 
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
 
 DT = 0.01
 
