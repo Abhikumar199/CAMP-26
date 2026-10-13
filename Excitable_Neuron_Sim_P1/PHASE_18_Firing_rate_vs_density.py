@@ -37,11 +37,6 @@ FINAL PLOT:
     Connected curve with error bars.
 """
 
-
-# ============================================================
-# IMPORTS
-# ============================================================
-
 from pathlib import Path
 import csv
 import time
@@ -62,11 +57,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================================
-# PATHS
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 
 RESULTS_DIR = (
@@ -80,39 +70,22 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 )
 
-
 ALL_FILE = (
     RESULTS_DIR
     / "all_realizations.csv"
 )
-
 
 SUMMARY_FILE = (
     RESULTS_DIR
     / "firing_rate_vs_p_summary.csv"
 )
 
-
 FIGURE_FILE = (
     RESULTS_DIR
     / "firing_rate_vs_density_p.png"
 )
 
-
-# ============================================================
-# FIXED NETWORK SIZE
-# ============================================================
-
 N = 1000
-
-
-# ============================================================
-# SHORTCUT DENSITY p
-# ============================================================
-
-# 21 equally spaced values:
-#
-# 0.00, 0.05, 0.10, ..., 1.00
 
 P_VALUES = np.linspace(
     0.0,
@@ -120,26 +93,7 @@ P_VALUES = np.linspace(
     21,
 )
 
-
-# ============================================================
-# NUMBER OF RANDOM NETWORK REALIZATIONS
-# ============================================================
-
-# First test:
-#     3
-#
-# Final exploratory result:
-#     10
-#
-# Stronger result:
-#     20 or more
-
 NUM_REALIZATIONS = 10
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 
@@ -149,11 +103,6 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 
 T_MAX = 2000.0
@@ -162,22 +111,12 @@ STIMULUS_TIME = 10.0
 
 STIMULUS_NEURON = N // 2
 
-
-# ============================================================
-# CPU SETTINGS
-# ============================================================
-
 CPU_COUNT = os.cpu_count() or 4
 
 MAX_WORKERS = max(
     1,
     CPU_COUNT - 1,
 )
-
-
-# ============================================================
-# CALCULATE WHOLE-NETWORK MEAN FIRING RATE
-# ============================================================
 
 def calculate_mean_firing_rate(
     spike_times,
@@ -188,33 +127,14 @@ def calculate_mean_firing_rate(
         dtype=float,
     )
 
-
-    # --------------------------------------------------------
-    # ONLY ANALYZE SPIKES AFTER THE STIMULUS
-    # --------------------------------------------------------
-
     analysis_spikes = spike_times[
         spike_times >= STIMULUS_TIME
     ]
-
-
-    # --------------------------------------------------------
-    # POST-STIMULUS OBSERVATION DURATION
-    # --------------------------------------------------------
 
     analysis_duration = (
         T_MAX
         - STIMULUS_TIME
     )
-
-
-    # --------------------------------------------------------
-    # MEAN WHOLE-NETWORK FIRING RATE
-    #
-    #                 total spikes
-    # r = -----------------------------------
-    #       N × post-stimulus duration
-    # --------------------------------------------------------
 
     firing_rate = (
 
@@ -229,26 +149,15 @@ def calculate_mean_firing_rate(
 
     )
 
-
     return float(
         firing_rate
     )
-
-
-# ============================================================
-# RUN ONE REALIZATION
-# ============================================================
 
 def run_one_realization(
     task,
 ):
 
     p, realization = task
-
-
-    # --------------------------------------------------------
-    # UNIQUE DETERMINISTIC SEED
-    # --------------------------------------------------------
 
     seed = (
 
@@ -264,19 +173,9 @@ def run_one_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # BUILD LOCAL RING
-    # --------------------------------------------------------
-
     local_network = build_ring_network(
         N
     )
-
-
-    # --------------------------------------------------------
-    # ADD RANDOM SHORTCUTS
-    # --------------------------------------------------------
 
     network, shortcuts = add_random_shortcuts(
 
@@ -289,13 +188,7 @@ def run_one_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # RUN SIMULATION
-    # --------------------------------------------------------
-
     start_time = time.perf_counter()
-
 
     spike_times, spike_neurons = run_simulation(
 
@@ -328,25 +221,14 @@ def run_one_realization(
 
     )
 
-
     runtime = (
         time.perf_counter()
         - start_time
     )
 
-
-    # --------------------------------------------------------
-    # CALCULATE FIRING RATE
-    # --------------------------------------------------------
-
     firing_rate = calculate_mean_firing_rate(
         spike_times
     )
-
-
-    # --------------------------------------------------------
-    # RETURN RESULT
-    # --------------------------------------------------------
 
     return {
 
@@ -376,13 +258,7 @@ def run_one_realization(
 
     }
 
-
-# ============================================================
-# MAIN
-# ============================================================
-
 def main():
-
 
     print("=" * 90)
 
@@ -392,12 +268,10 @@ def main():
 
     print("=" * 90)
 
-
     print(
         "\nFixed N =",
         N,
     )
-
 
     print(
         "p range =",
@@ -406,37 +280,27 @@ def main():
         f"{P_VALUES[-1]:.2f}",
     )
 
-
     print(
         "Number of p values =",
         len(P_VALUES),
     )
-
 
     print(
         "Realizations per p =",
         NUM_REALIZATIONS,
     )
 
-
     print(
         "Logical CPU cores =",
         CPU_COUNT,
     )
-
 
     print(
         "Workers used =",
         MAX_WORKERS,
     )
 
-
-    # ========================================================
-    # CREATE TASKS
-    # ========================================================
-
     tasks = []
-
 
     for p in P_VALUES:
 
@@ -451,16 +315,10 @@ def main():
                 )
             )
 
-
     print(
         "\nTotal simulations =",
         len(tasks),
     )
-
-
-    # ========================================================
-    # RUN SIMULATIONS IN PARALLEL
-    # ========================================================
 
     all_results = []
 
@@ -468,11 +326,9 @@ def main():
 
     total_start = time.perf_counter()
 
-
     print("\nRUNNING SIMULATIONS")
 
     print("-" * 90)
-
 
     with ProcessPoolExecutor(
 
@@ -481,9 +337,7 @@ def main():
 
     ) as executor:
 
-
         future_to_task = {
-
 
             executor.submit(
 
@@ -495,35 +349,27 @@ def main():
 
             task
 
-
             for task in tasks
 
         }
-
 
         for future in as_completed(
             future_to_task
         ):
 
-
             p, realization = (
                 future_to_task[future]
             )
 
-
             try:
 
-
                 result = future.result()
-
 
                 all_results.append(
                     result
                 )
 
-
                 completed += 1
-
 
                 print(
 
@@ -546,9 +392,7 @@ def main():
 
                 )
 
-
             except Exception as error:
-
 
                 print(
                     "\nERROR:"
@@ -568,11 +412,6 @@ def main():
                     error
                 )
 
-
-    # ========================================================
-    # SORT RESULTS
-    # ========================================================
-
     all_results.sort(
 
         key=lambda row:
@@ -584,11 +423,6 @@ def main():
 
     )
 
-
-    # ========================================================
-    # SAVE ALL REALIZATIONS
-    # ========================================================
-
     with open(
 
         ALL_FILE,
@@ -598,7 +432,6 @@ def main():
         newline="",
 
     ) as file:
-
 
         fieldnames = [
 
@@ -620,7 +453,6 @@ def main():
 
         ]
 
-
         writer = csv.DictWriter(
 
             file,
@@ -630,21 +462,13 @@ def main():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
             all_results
         )
 
-
-    # ========================================================
-    # CALCULATE SUMMARY FOR EACH p
-    # ========================================================
-
     summary_results = []
-
 
     print("\n")
 
@@ -656,12 +480,9 @@ def main():
 
     print("=" * 90)
 
-
     for p in P_VALUES:
 
-
         p = float(p)
-
 
         p_rows = [
 
@@ -675,7 +496,6 @@ def main():
             )
 
         ]
-
 
         firing_rates = np.asarray(
 
@@ -691,7 +511,6 @@ def main():
 
         )
 
-
         shortcut_counts = np.asarray(
 
             [
@@ -706,15 +525,9 @@ def main():
 
         )
 
-
-        # ----------------------------------------------------
-        # STATISTICS
-        # ----------------------------------------------------
-
         mean_firing_rate = float(
             np.mean(firing_rates)
         )
-
 
         std_firing_rate = float(
 
@@ -725,15 +538,9 @@ def main():
 
         ) if len(firing_rates) > 1 else 0.0
 
-
         mean_shortcuts = float(
             np.mean(shortcut_counts)
         )
-
-
-        # ----------------------------------------------------
-        # SAVE SUMMARY
-        # ----------------------------------------------------
 
         summary_results.append({
 
@@ -757,11 +564,6 @@ def main():
 
         })
 
-
-        # ----------------------------------------------------
-        # PRINT VALUES
-        # ----------------------------------------------------
-
         print(
 
             f"p = {p:4.2f}"
@@ -777,11 +579,6 @@ def main():
 
         )
 
-
-    # ========================================================
-    # SAVE SUMMARY CSV
-    # ========================================================
-
     with open(
 
         SUMMARY_FILE,
@@ -791,7 +588,6 @@ def main():
         newline="",
 
     ) as file:
-
 
         fieldnames = [
 
@@ -809,7 +605,6 @@ def main():
 
         ]
 
-
         writer = csv.DictWriter(
 
             file,
@@ -819,18 +614,11 @@ def main():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
             summary_results
         )
-
-
-    # ========================================================
-    # PREPARE PLOT DATA
-    # ========================================================
 
     p_plot = np.asarray(
 
@@ -846,7 +634,6 @@ def main():
 
     )
 
-
     mean_fr_plot = np.asarray(
 
         [
@@ -860,7 +647,6 @@ def main():
         dtype=float,
 
     )
-
 
     std_fr_plot = np.asarray(
 
@@ -876,15 +662,9 @@ def main():
 
     )
 
-
-    # ========================================================
-    # CREATE CONNECTED CURVE
-    # ========================================================
-
     plt.figure(
         figsize=(9, 6)
     )
-
 
     plt.plot(
 
@@ -902,11 +682,6 @@ def main():
 
     )
 
-
-    # --------------------------------------------------------
-    # ERROR REGION
-    # --------------------------------------------------------
-
     plt.fill_between(
 
         p_plot,
@@ -919,38 +694,30 @@ def main():
 
     )
 
-
     plt.xlabel(
         "Shortcut density, p"
     )
-
 
     plt.ylabel(
         "Mean whole-network firing rate"
     )
 
-
     plt.title(
         "Firing Rate vs Shortcut Density (N = 1000)"
     )
-
 
     plt.xlim(
         0.0,
         1.0,
     )
 
-
     plt.legend()
-
 
     plt.grid(
         alpha=0.25
     )
 
-
     plt.tight_layout()
-
 
     plt.savefig(
 
@@ -962,13 +729,7 @@ def main():
 
     )
 
-
     plt.show()
-
-
-    # ========================================================
-    # FINAL INFORMATION
-    # ========================================================
 
     total_runtime = (
 
@@ -977,7 +738,6 @@ def main():
         - total_start
 
     )
-
 
     print("\n")
 
@@ -989,12 +749,10 @@ def main():
 
     print("=" * 90)
 
-
     print(
         "Total runtime =",
         f"{total_runtime:.2f} seconds",
     )
-
 
     print(
         "All realizations saved to:"
@@ -1004,7 +762,6 @@ def main():
         ALL_FILE
     )
 
-
     print(
         "\nSummary saved to:"
     )
@@ -1013,7 +770,6 @@ def main():
         SUMMARY_FILE
     )
 
-
     print(
         "\nFigure saved to:"
     )
@@ -1021,11 +777,6 @@ def main():
     print(
         FIGURE_FILE
     )
-
-
-# ============================================================
-# WINDOWS MULTIPROCESSING PROTECTION
-# ============================================================
 
 if __name__ == "__main__":
 
