@@ -48,13 +48,7 @@ from network import (
     add_random_shortcuts,
 )
 
-
-# ============================================================
-# PATH SETUP
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
-
 
 PHASE6_DIR = (
     PROJECT_DIR
@@ -62,60 +56,32 @@ PHASE6_DIR = (
     / "phase6"
 )
 
-
 RESULTS_DIR = (
     PROJECT_DIR
     / "results"
     / "phase7"
 )
 
-
 RESULTS_DIR.mkdir(
     parents=True,
     exist_ok=True,
 )
-
 
 PHASE6_ALL_FILE = (
     PHASE6_DIR
     / "phase6_all_realizations.csv"
 )
 
-
 PHASE6_PROBABILITY_FILE = (
     PHASE6_DIR
     / "phase6_probability_curve.csv"
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 100
 
 STIMULUS_NEURON = N // 2
 
-
-# ============================================================
-# p SELECTION
-# ============================================================
-
-# None:
-#
-#     automatically choose mixed p closest
-#     to P_success = 0.5
-#
-# Example manual selection:
-#
-#     MANUAL_P = 0.10
-
 MANUAL_P = None
-
-
-# ============================================================
-# READ CSV
-# ============================================================
 
 def read_csv(file_path):
 
@@ -130,7 +96,6 @@ def read_csv(file_path):
             "Run Phase 6 first."
         )
 
-
     with open(
 
         file_path,
@@ -141,20 +106,13 @@ def read_csv(file_path):
 
     ) as file:
 
-
         rows = list(
 
             csv.DictReader(file)
 
         )
 
-
     return rows
-
-
-# ============================================================
-# CIRCULAR DISTANCE
-# ============================================================
 
 def circular_distance(
     neuron_a,
@@ -169,7 +127,6 @@ def circular_distance(
 
     )
 
-
     return min(
 
         direct_distance,
@@ -177,11 +134,6 @@ def circular_distance(
         N - direct_distance,
 
     )
-
-
-# ============================================================
-# DIRECTED SHORTEST PATH
-# ============================================================
 
 def directed_shortest_paths(
 
@@ -197,7 +149,6 @@ def directed_shortest_paths(
 
     )
 
-
     distances = np.full(
 
         N,
@@ -206,18 +157,13 @@ def directed_shortest_paths(
 
     )
 
-
     distances[source] = 0
-
 
     queue = [source]
 
-
     queue_index = 0
 
-
     while queue_index < len(queue):
-
 
         current = queue[
 
@@ -225,9 +171,7 @@ def directed_shortest_paths(
 
         ]
 
-
         queue_index += 1
-
 
         for target in (
 
@@ -235,13 +179,11 @@ def directed_shortest_paths(
 
         ):
 
-
             if np.isinf(
 
                 distances[target]
 
             ):
-
 
                 distances[target] = (
 
@@ -251,20 +193,13 @@ def directed_shortest_paths(
 
                 )
 
-
                 queue.append(
 
                     target
 
                 )
 
-
     return distances
-
-
-# ============================================================
-# GLOBAL PATH METRICS
-# ============================================================
 
 def calculate_path_metrics(
 
@@ -278,14 +213,11 @@ def calculate_path_metrics(
 
     )
 
-
     path_lengths = []
 
     inverse_distances = []
 
-
     for source in range(N):
-
 
         distances = (
 
@@ -299,14 +231,11 @@ def calculate_path_metrics(
 
         )
 
-
         for target in range(N):
-
 
             if source == target:
 
                 continue
-
 
             distance = (
 
@@ -314,9 +243,7 @@ def calculate_path_metrics(
 
             )
 
-
             if np.isfinite(distance):
-
 
                 path_lengths.append(
 
@@ -324,23 +251,19 @@ def calculate_path_metrics(
 
                 )
 
-
                 inverse_distances.append(
 
                     1.0 / distance
 
                 )
 
-
             else:
-
 
                 inverse_distances.append(
 
                     0.0
 
                 )
-
 
     mean_path_length = float(
 
@@ -352,7 +275,6 @@ def calculate_path_metrics(
 
     )
 
-
     global_efficiency = float(
 
         np.mean(
@@ -363,7 +285,6 @@ def calculate_path_metrics(
 
     )
 
-
     return (
 
         mean_path_length,
@@ -372,11 +293,6 @@ def calculate_path_metrics(
 
     )
 
-
-# ============================================================
-# STIMULUS PATH METRICS
-# ============================================================
-
 def stimulus_path_metrics(
 
     outgoing_connections,
@@ -384,7 +300,6 @@ def stimulus_path_metrics(
     stimulus_neuron,
 
 ):
-
 
     distances = (
 
@@ -398,13 +313,11 @@ def stimulus_path_metrics(
 
     )
 
-
     finite_distances = distances[
 
         np.isfinite(distances)
 
     ]
-
 
     finite_distances = (
 
@@ -416,9 +329,7 @@ def stimulus_path_metrics(
 
     )
 
-
     if len(finite_distances) == 0:
-
 
         return (
 
@@ -427,7 +338,6 @@ def stimulus_path_metrics(
             np.nan,
 
         )
-
 
     mean_distance = float(
 
@@ -439,7 +349,6 @@ def stimulus_path_metrics(
 
     )
 
-
     max_distance = float(
 
         np.max(
@@ -450,7 +359,6 @@ def stimulus_path_metrics(
 
     )
 
-
     return (
 
         mean_distance,
@@ -459,17 +367,11 @@ def stimulus_path_metrics(
 
     )
 
-
-# ============================================================
-# RECIPROCAL SHORTCUTS
-# ============================================================
-
 def count_reciprocal_shortcuts(
 
     shortcuts,
 
 ):
-
 
     shortcut_set = set(
 
@@ -477,12 +379,9 @@ def count_reciprocal_shortcuts(
 
     )
 
-
     reciprocal_count = 0
 
-
     for source, target in shortcuts:
-
 
         reverse_edge = (
 
@@ -492,22 +391,13 @@ def count_reciprocal_shortcuts(
 
         )
 
-
         if reverse_edge in shortcut_set:
-
 
             if source < target:
 
-
                 reciprocal_count += 1
 
-
     return reciprocal_count
-
-
-# ============================================================
-# EXTRACT TOPOLOGY FEATURES
-# ============================================================
 
 def extract_topology_features(
 
@@ -519,13 +409,7 @@ def extract_topology_features(
 
 ):
 
-
     N = len(network)
-
-
-    # --------------------------------------------------------
-    # SHORTCUT LENGTHS
-    # --------------------------------------------------------
 
     shortcut_lengths = [
 
@@ -545,11 +429,6 @@ def extract_topology_features(
 
     ]
 
-
-    # --------------------------------------------------------
-    # SHORTCUT SOURCES
-    # --------------------------------------------------------
-
     shortcut_sources = [
 
         source
@@ -560,11 +439,6 @@ def extract_topology_features(
 
     ]
 
-
-    # --------------------------------------------------------
-    # SHORTCUT TARGETS
-    # --------------------------------------------------------
-
     shortcut_targets = [
 
         target
@@ -574,11 +448,6 @@ def extract_topology_features(
         in shortcuts
 
     ]
-
-
-    # --------------------------------------------------------
-    # DISTANCE OF SOURCES FROM STIMULUS
-    # --------------------------------------------------------
 
     source_distances = [
 
@@ -598,11 +467,6 @@ def extract_topology_features(
 
     ]
 
-
-    # --------------------------------------------------------
-    # DISTANCE OF TARGETS FROM STIMULUS
-    # --------------------------------------------------------
-
     target_distances = [
 
         circular_distance(
@@ -621,11 +485,6 @@ def extract_topology_features(
 
     ]
 
-
-    # --------------------------------------------------------
-    # DEGREE STATISTICS
-    # --------------------------------------------------------
-
     out_degrees = np.array(
 
         [
@@ -642,7 +501,6 @@ def extract_topology_features(
 
     )
 
-
     in_degrees = np.zeros(
 
         N,
@@ -651,19 +509,11 @@ def extract_topology_features(
 
     )
 
-
     for source in range(N):
-
 
         for target in network[source]:
 
-
             in_degrees[target] += 1
-
-
-    # --------------------------------------------------------
-    # GLOBAL PATH METRICS
-    # --------------------------------------------------------
 
     (
 
@@ -676,11 +526,6 @@ def extract_topology_features(
         network
 
     )
-
-
-    # --------------------------------------------------------
-    # STIMULUS PATH METRICS
-    # --------------------------------------------------------
 
     (
 
@@ -696,18 +541,11 @@ def extract_topology_features(
 
     )
 
-
-    # --------------------------------------------------------
-    # RETURN FEATURES
-    # --------------------------------------------------------
-
     return {
-
 
         "number_of_shortcuts":
 
             len(shortcuts),
-
 
         "mean_shortcut_length":
 
@@ -721,7 +559,6 @@ def extract_topology_features(
 
             ),
 
-
         "std_shortcut_length":
 
             float(
@@ -733,7 +570,6 @@ def extract_topology_features(
                 )
 
             ),
-
 
         "max_shortcut_length":
 
@@ -747,7 +583,6 @@ def extract_topology_features(
 
             ),
 
-
         "unique_shortcut_sources":
 
             len(
@@ -759,7 +594,6 @@ def extract_topology_features(
                 )
 
             ),
-
 
         "unique_shortcut_targets":
 
@@ -773,7 +607,6 @@ def extract_topology_features(
 
             ),
 
-
         "mean_source_distance_from_stimulus":
 
             float(
@@ -785,7 +618,6 @@ def extract_topology_features(
                 )
 
             ),
-
 
         "min_source_distance_from_stimulus":
 
@@ -799,7 +631,6 @@ def extract_topology_features(
 
             ),
 
-
         "mean_target_distance_from_stimulus":
 
             float(
@@ -811,7 +642,6 @@ def extract_topology_features(
                 )
 
             ),
-
 
         "min_target_distance_from_stimulus":
 
@@ -825,7 +655,6 @@ def extract_topology_features(
 
             ),
 
-
         "std_out_degree":
 
             float(
@@ -837,7 +666,6 @@ def extract_topology_features(
                 )
 
             ),
-
 
         "max_out_degree":
 
@@ -851,7 +679,6 @@ def extract_topology_features(
 
             ),
 
-
         "std_in_degree":
 
             float(
@@ -863,7 +690,6 @@ def extract_topology_features(
                 )
 
             ),
-
 
         "max_in_degree":
 
@@ -877,7 +703,6 @@ def extract_topology_features(
 
             ),
 
-
         "reciprocal_shortcuts":
 
             count_reciprocal_shortcuts(
@@ -886,21 +711,17 @@ def extract_topology_features(
 
             ),
 
-
         "mean_path_length":
 
             mean_path_length,
-
 
         "global_efficiency":
 
             global_efficiency,
 
-
         "mean_distance_from_stimulus":
 
             mean_stimulus_path,
-
 
         "max_distance_from_stimulus":
 
@@ -908,13 +729,7 @@ def extract_topology_features(
 
     }
 
-
-# ============================================================
-# HEADER
-# ============================================================
-
 print("=" * 80)
-
 
 print(
 
@@ -922,13 +737,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
-
-# ============================================================
-# LOAD PHASE 6 RESULTS
-# ============================================================
 
 all_phase6_results = read_csv(
 
@@ -936,20 +745,13 @@ all_phase6_results = read_csv(
 
 )
 
-
 probability_results = read_csv(
 
     PHASE6_PROBABILITY_FILE
 
 )
 
-
-# ============================================================
-# SELECT TRANSITION p
-# ============================================================
-
 if MANUAL_P is not None:
-
 
     selected_p = float(
 
@@ -957,29 +759,23 @@ if MANUAL_P is not None:
 
     )
 
-
     selection_method = (
 
         "MANUAL"
 
     )
 
-
 else:
-
 
     mixed_p_values = []
 
-
     for row in probability_results:
-
 
         p = float(
 
             row["p"]
 
         )
-
 
         probability_success = float(
 
@@ -991,7 +787,6 @@ else:
 
         )
 
-
         if (
 
             probability_success > 0.0
@@ -1002,7 +797,6 @@ else:
 
         ):
 
-
             distance_from_half = abs(
 
                 probability_success
@@ -1010,7 +804,6 @@ else:
                 - 0.5
 
             )
-
 
             mixed_p_values.append(
 
@@ -1026,9 +819,7 @@ else:
 
             )
 
-
     if len(mixed_p_values) == 0:
-
 
         raise RuntimeError(
 
@@ -1040,9 +831,7 @@ else:
 
         )
 
-
     mixed_p_values.sort()
-
 
     (
 
@@ -1054,23 +843,15 @@ else:
 
     ) = mixed_p_values[0]
 
-
     selection_method = (
 
         "AUTOMATIC"
 
     )
 
-
-# ============================================================
-# PRINT SELECTED p
-# ============================================================
-
 print("\nSELECTED TRANSITION POINT")
 
-
 print("-" * 50)
-
 
 print(
 
@@ -1080,7 +861,6 @@ print(
 
 )
 
-
 print(
 
     "Selected p =",
@@ -1089,23 +869,15 @@ print(
 
 )
 
-
-# ============================================================
-# SELECT REALIZATIONS AT p
-# ============================================================
-
 selected_realizations = []
 
-
 for row in all_phase6_results:
-
 
     row_p = float(
 
         row["p"]
 
     )
-
 
     if np.isclose(
 
@@ -1115,17 +887,11 @@ for row in all_phase6_results:
 
     ):
 
-
         selected_realizations.append(
 
             row
 
         )
-
-
-# ============================================================
-# COUNT OUTCOMES
-# ============================================================
 
 success_count = sum(
 
@@ -1137,7 +903,6 @@ success_count = sum(
 
 )
 
-
 failure_count = sum(
 
     row["status"] == "FAILURE"
@@ -1148,7 +913,6 @@ failure_count = sum(
 
 )
 
-
 print(
 
     "Total realizations =",
@@ -1156,7 +920,6 @@ print(
     len(selected_realizations),
 
 )
-
 
 print(
 
@@ -1166,7 +929,6 @@ print(
 
 )
 
-
 print(
 
     "Failures =",
@@ -1174,11 +936,6 @@ print(
     failure_count,
 
 )
-
-
-# ============================================================
-# VALIDATE MIXED OUTCOMES
-# ============================================================
 
 if (
 
@@ -1190,7 +947,6 @@ if (
 
 ):
 
-
     raise RuntimeError(
 
         "Selected p does not contain "
@@ -1199,16 +955,9 @@ if (
 
     )
 
-
-# ============================================================
-# RECONSTRUCT NETWORKS
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1216,12 +965,9 @@ print(
 
 )
 
-
 print("=" * 80)
 
-
 topology_results = []
-
 
 for index, row in enumerate(
 
@@ -1229,13 +975,11 @@ for index, row in enumerate(
 
 ):
 
-
     seed = int(
 
         row["seed"]
 
     )
-
 
     status = (
 
@@ -1243,37 +987,19 @@ for index, row in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # BINARY OUTCOME
-    # --------------------------------------------------------
-
     if status == "SUCCESS":
-
 
         outcome = 1
 
-
     else:
 
-
         outcome = 0
-
-
-    # --------------------------------------------------------
-    # BUILD EXACT SAME RING
-    # --------------------------------------------------------
 
     local_network = (
 
         build_ring_network(N)
 
     )
-
-
-    # --------------------------------------------------------
-    # RECREATE EXACT SAME SHORTCUTS
-    # --------------------------------------------------------
 
     network, shortcuts = (
 
@@ -1290,11 +1016,6 @@ for index, row in enumerate(
         )
 
     )
-
-
-    # --------------------------------------------------------
-    # EXTRACT FEATURES
-    # --------------------------------------------------------
 
     features = (
 
@@ -1316,38 +1037,27 @@ for index, row in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # STORE RESULT
-    # --------------------------------------------------------
-
     topology_row = {
-
 
         "p":
 
             selected_p,
 
-
         "seed":
 
             seed,
-
 
         "status":
 
             status,
 
-
         "outcome":
 
             outcome,
 
-
         **features,
 
     }
-
 
     topology_results.append(
 
@@ -1355,45 +1065,29 @@ for index, row in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # PRINT PROGRESS
-    # --------------------------------------------------------
-
     print(
-
 
         f"{index + 1:3d}/"
 
         f"{len(selected_realizations):3d} | "
 
-
         f"Seed {seed:3d} | "
 
-
         f"{status:7s} | "
-
 
         f"Shortcut length = "
 
         f"{features['mean_shortcut_length']:.2f} | "
 
-
         f"Path length = "
 
         f"{features['mean_path_length']:.3f} | "
-
 
         f"Efficiency = "
 
         f"{features['global_efficiency']:.3f}"
 
     )
-
-
-# ============================================================
-# SAVE TOPOLOGY FEATURES
-# ============================================================
 
 topology_file = (
 
@@ -1402,7 +1096,6 @@ topology_file = (
     / "phase7_topology_features.csv"
 
 )
-
 
 with open(
 
@@ -1413,7 +1106,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1429,20 +1121,13 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
         topology_results
 
     )
-
-
-# ============================================================
-# IDENTIFY FEATURE COLUMNS
-# ============================================================
 
 metadata_columns = {
 
@@ -1455,7 +1140,6 @@ metadata_columns = {
     "outcome",
 
 }
-
 
 feature_names = [
 
@@ -1470,11 +1154,6 @@ feature_names = [
     not in metadata_columns
 
 ]
-
-
-# ============================================================
-# CORRELATION WITH SUCCESS
-# ============================================================
 
 outcomes = np.array(
 
@@ -1492,12 +1171,9 @@ outcomes = np.array(
 
 )
 
-
 correlation_results = []
 
-
 for feature in feature_names:
-
 
     values = np.array(
 
@@ -1519,19 +1195,11 @@ for feature in feature_names:
 
     )
 
-
-    # --------------------------------------------------------
-    # CONSTANT FEATURE
-    # --------------------------------------------------------
-
     if np.std(values) == 0:
-
 
         correlation = 0.0
 
-
     else:
-
 
         correlation = float(
 
@@ -1545,30 +1213,21 @@ for feature in feature_names:
 
         )
 
-
     correlation_results.append({
-
 
         "feature":
 
             feature,
 
-
         "correlation_with_success":
 
             correlation,
-
 
         "absolute_correlation":
 
             abs(correlation),
 
     })
-
-
-# ============================================================
-# SORT CORRELATIONS
-# ============================================================
 
 correlation_results.sort(
 
@@ -1580,11 +1239,6 @@ correlation_results.sort(
 
 )
 
-
-# ============================================================
-# SAVE CORRELATIONS
-# ============================================================
-
 correlation_file = (
 
     RESULTS_DIR
@@ -1592,7 +1246,6 @@ correlation_file = (
     / "phase7_correlations.csv"
 
 )
-
 
 with open(
 
@@ -1603,7 +1256,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1621,9 +1273,7 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
@@ -1631,16 +1281,9 @@ with open(
 
     )
 
-
-# ============================================================
-# SUCCESS VS FAILURE GROUP COMPARISON
-# ============================================================
-
 group_results = []
 
-
 for feature in feature_names:
-
 
     success_values = np.array(
 
@@ -1664,7 +1307,6 @@ for feature in feature_names:
 
     )
 
-
     failure_values = np.array(
 
         [
@@ -1687,7 +1329,6 @@ for feature in feature_names:
 
     )
 
-
     success_mean = float(
 
         np.mean(
@@ -1697,7 +1338,6 @@ for feature in feature_names:
         )
 
     )
-
 
     failure_mean = float(
 
@@ -1709,7 +1349,6 @@ for feature in feature_names:
 
     )
 
-
     difference = (
 
         success_mean
@@ -1718,35 +1357,25 @@ for feature in feature_names:
 
     )
 
-
     group_results.append({
-
 
         "feature":
 
             feature,
 
-
         "success_mean":
 
             success_mean,
 
-
         "failure_mean":
 
             failure_mean,
-
 
         "difference_success_minus_failure":
 
             difference,
 
     })
-
-
-# ============================================================
-# SAVE GROUP COMPARISON
-# ============================================================
 
 group_file = (
 
@@ -1755,7 +1384,6 @@ group_file = (
     / "phase7_group_comparison.csv"
 
 )
-
 
 with open(
 
@@ -1766,7 +1394,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1786,9 +1413,7 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
@@ -1796,16 +1421,9 @@ with open(
 
     )
 
-
-# ============================================================
-# PRINT TOP CORRELATIONS
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1813,37 +1431,25 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 for row in correlation_results[:10]:
 
-
     print(
-
 
         f"{row['feature']:40s} | "
 
-
         f"r = "
-
 
         f"{row['correlation_with_success']:+.3f}"
 
     )
-
-
-# ============================================================
-# PLOT TOP CORRELATIONS
-# ============================================================
 
 top_results = (
 
     correlation_results[:10]
 
 )
-
 
 plot_features = [
 
@@ -1855,7 +1461,6 @@ plot_features = [
 
 ]
 
-
 plot_correlations = [
 
     row["correlation_with_success"]
@@ -1866,20 +1471,17 @@ plot_correlations = [
 
 ]
 
-
 y_positions = np.arange(
 
     len(plot_features)
 
 )
 
-
 plt.figure(
 
     figsize=(10, 7)
 
 )
-
 
 plt.barh(
 
@@ -1889,7 +1491,6 @@ plt.barh(
 
 )
 
-
 plt.yticks(
 
     y_positions,
@@ -1897,7 +1498,6 @@ plt.yticks(
     plot_features,
 
 )
-
 
 plt.axvline(
 
@@ -1907,13 +1507,11 @@ plt.axvline(
 
 )
 
-
 plt.xlabel(
 
     "Correlation with propagation success"
 
 )
-
 
 plt.title(
 
@@ -1923,12 +1521,9 @@ plt.title(
 
 )
 
-
 plt.gca().invert_yaxis()
 
-
 plt.tight_layout()
-
 
 figure_file = (
 
@@ -1937,7 +1532,6 @@ figure_file = (
     / "phase7_topology_correlations.png"
 
 )
-
 
 plt.savefig(
 
@@ -1949,19 +1543,11 @@ plt.savefig(
 
 )
 
-
 plt.show()
-
-
-# ============================================================
-# VALIDATION
-# ============================================================
 
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1969,9 +1555,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 if (
 
@@ -1989,9 +1573,7 @@ if (
 
 ):
 
-
     print("PASSED")
-
 
     print(
 
@@ -1999,35 +1581,23 @@ if (
 
     )
 
-
     print(
 
         "Both SUCCESS and FAILURE networks were analyzed."
 
     )
 
-
 else:
-
 
     print("FAILED")
 
-
-# ============================================================
-# OUTPUT FILES
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print("RESULTS SAVED")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -2035,13 +1605,11 @@ print(
 
 )
 
-
 print(
 
     topology_file
 
 )
-
 
 print(
 
@@ -2049,13 +1617,11 @@ print(
 
 )
 
-
 print(
 
     correlation_file
 
 )
-
 
 print(
 
@@ -2063,13 +1629,11 @@ print(
 
 )
 
-
 print(
 
     group_file
 
 )
-
 
 print(
 
@@ -2077,21 +1641,16 @@ print(
 
 )
 
-
 print(
 
     figure_file
 
 )
 
-
 print("\n")
-
 
 print("=" * 80)
 
-
 print("PHASE 7 COMPLETE")
-
 
 print("=" * 80)
