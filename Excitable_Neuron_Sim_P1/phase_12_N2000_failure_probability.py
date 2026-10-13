@@ -53,11 +53,6 @@ A realization is classified as SUCCESS only if
 activity reaches the final observation window.
 """
 
-
-# ============================================================
-# IMPORTS
-# ============================================================
-
 from pathlib import Path
 
 import csv
@@ -66,28 +61,20 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 from network import (
     build_ring_network,
     add_random_shortcuts,
 )
 
-
 from simulator import (
     run_simulation,
 )
-
-
-# ============================================================
-# PATH SETUP
-# ============================================================
 
 PROJECT_DIR = (
     Path(__file__)
     .resolve()
     .parent
 )
-
 
 RESULTS_DIR = (
 
@@ -99,7 +86,6 @@ RESULTS_DIR = (
 
 )
 
-
 RESULTS_DIR.mkdir(
 
     parents=True,
@@ -107,7 +93,6 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 
 )
-
 
 ALL_REALIZATIONS_FILE = (
 
@@ -117,7 +102,6 @@ ALL_REALIZATIONS_FILE = (
 
 )
 
-
 PROBABILITY_FILE = (
 
     RESULTS_DIR
@@ -125,7 +109,6 @@ PROBABILITY_FILE = (
     / "phase12_N2000_probability_curve.csv"
 
 )
-
 
 FIGURE_FILE = (
 
@@ -135,17 +118,7 @@ FIGURE_FILE = (
 
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 2000
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 
@@ -155,16 +128,9 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 
-
 T_MAX = 3000.0
-
 
 STIMULUS_NEURON = (
 
@@ -172,56 +138,13 @@ STIMULUS_NEURON = (
 
 )
 
-
 STIMULUS_TIME = 10.0
-
-
-# ============================================================
-# CLASSIFICATION WINDOW
-# ============================================================
 
 FINAL_WINDOW_START = 2800.0
 
 FINAL_WINDOW_END = 3000.0
 
-
-# ============================================================
-# NUMBER OF REALIZATIONS
-# ============================================================
-
-# Start with 100.
-#
-# After locating the transition region:
-#
-#     rerun only that region with:
-#
-#         500
-#
-# or ideally:
-#
-#         2000
-#
-# realizations.
-
 NUM_REALIZATIONS = 100
-
-
-# ============================================================
-# p VALUES
-# ============================================================
-
-# Based on Phase 11 pilot results.
-#
-# IMPORTANT:
-#
-# This is a first exploratory sweep.
-#
-# After this run, refine the p grid around
-# the actual transition region.
-
-# ============================================================
-# p VALUES — 20 EQUALLY SPACED VALUES FROM 0 TO 1
-# ============================================================
 
 P_VALUES = np.linspace(
     0.0,
@@ -229,17 +152,11 @@ P_VALUES = np.linspace(
     20,
 )
 
-
-# ============================================================
-# CLASSIFY REALIZATION
-# ============================================================
-
 def classify_realization(
 
     spike_times,
 
 ):
-
 
     spike_times = np.asarray(
 
@@ -249,13 +166,7 @@ def classify_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # NO SPIKES
-    # --------------------------------------------------------
-
     if len(spike_times) == 0:
-
 
         return {
 
@@ -263,32 +174,23 @@ def classify_realization(
 
                 "FAILURE",
 
-
             "total_spikes":
 
                 0,
-
 
             "last_spike_time":
 
                 np.nan,
 
-
             "late_spikes":
 
                 0,
-
 
             "activity_duration":
 
                 0.0,
 
         }
-
-
-    # --------------------------------------------------------
-    # LAST SPIKE TIME
-    # --------------------------------------------------------
 
     last_spike_time = float(
 
@@ -300,11 +202,6 @@ def classify_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # ACTIVITY DURATION
-    # --------------------------------------------------------
-
     activity_duration = (
 
         last_spike_time
@@ -312,11 +209,6 @@ def classify_realization(
         - STIMULUS_TIME
 
     )
-
-
-    # --------------------------------------------------------
-    # SPIKES IN FINAL WINDOW
-    # --------------------------------------------------------
 
     late_spikes = int(
 
@@ -344,22 +236,13 @@ def classify_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # CLASSIFICATION
-    # --------------------------------------------------------
-
     if late_spikes > 0:
-
 
         status = "SUCCESS"
 
-
     else:
 
-
         status = "FAILURE"
-
 
     return {
 
@@ -367,21 +250,17 @@ def classify_realization(
 
             status,
 
-
         "total_spikes":
 
             len(spike_times),
-
 
         "last_spike_time":
 
             last_spike_time,
 
-
         "late_spikes":
 
             late_spikes,
-
 
         "activity_duration":
 
@@ -389,13 +268,7 @@ def classify_realization(
 
     }
 
-
-# ============================================================
-# HEADER
-# ============================================================
-
 print("=" * 80)
-
 
 print(
 
@@ -403,15 +276,11 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print("\nNETWORK")
 
-
 print("-" * 50)
-
 
 print(
 
@@ -421,12 +290,9 @@ print(
 
 )
 
-
 print("\nNEURON PARAMETERS")
 
-
 print("-" * 50)
-
 
 print(
 
@@ -436,7 +302,6 @@ print(
 
 )
 
-
 print(
 
     "g_syn =",
@@ -444,7 +309,6 @@ print(
     G_SYN,
 
 )
-
 
 print(
 
@@ -454,7 +318,6 @@ print(
 
 )
 
-
 print(
 
     "tau_D =",
@@ -463,12 +326,9 @@ print(
 
 )
 
-
 print("\nSIMULATION")
 
-
 print("-" * 50)
-
 
 print(
 
@@ -478,7 +338,6 @@ print(
 
 )
 
-
 print(
 
     "T_max =",
@@ -486,7 +345,6 @@ print(
     T_MAX,
 
 )
-
 
 print(
 
@@ -500,7 +358,6 @@ print(
 
 )
 
-
 print(
 
     "Realizations per p =",
@@ -509,15 +366,11 @@ print(
 
 )
 
-
 print("\np VALUES")
-
 
 print("-" * 50)
 
-
 for p in P_VALUES:
-
 
     print(
 
@@ -529,25 +382,13 @@ for p in P_VALUES:
 
     )
 
-
-# ============================================================
-# STORAGE
-# ============================================================
-
 all_realization_results = []
 
 probability_results = []
 
-
-# ============================================================
-# BUILD LOCAL RING ONCE
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -555,9 +396,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 local_network = (
 
@@ -569,13 +408,11 @@ local_network = (
 
 )
 
-
 print(
 
     "Local ring created."
 
 )
-
 
 print(
 
@@ -585,21 +422,11 @@ print(
 
 )
 
-
-# ============================================================
-# TOTAL TIMER
-# ============================================================
-
 total_start_time = (
 
     time.perf_counter()
 
 )
-
-
-# ============================================================
-# RUN PROBABILITY SWEEP
-# ============================================================
 
 for p_index, p in enumerate(
 
@@ -607,9 +434,7 @@ for p_index, p in enumerate(
 
 ):
 
-
     p = float(p)
-
 
     number_of_shortcuts = int(
 
@@ -621,12 +446,9 @@ for p_index, p in enumerate(
 
     )
 
-
     print("\n")
 
-
     print("=" * 80)
-
 
     print(
 
@@ -634,9 +456,7 @@ for p_index, p in enumerate(
 
     )
 
-
     print("=" * 80)
-
 
     print(
 
@@ -645,7 +465,6 @@ for p_index, p in enumerate(
         number_of_shortcuts,
 
     )
-
 
     print(
 
@@ -657,15 +476,9 @@ for p_index, p in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # COUNTERS
-    # --------------------------------------------------------
-
     success_count = 0
 
     failure_count = 0
-
 
     p_start_time = (
 
@@ -673,21 +486,11 @@ for p_index, p in enumerate(
 
     )
 
-
-    # ========================================================
-    # NETWORK REALIZATIONS
-    # ========================================================
-
     for seed in range(
 
         NUM_REALIZATIONS
 
     ):
-
-
-        # ----------------------------------------------------
-        # BUILD NETWORK
-        # ----------------------------------------------------
 
         network, shortcuts = (
 
@@ -697,11 +500,9 @@ for p_index, p in enumerate(
 
                     local_network,
 
-
                 p=
 
                     p,
-
 
                 seed=
 
@@ -711,21 +512,11 @@ for p_index, p in enumerate(
 
         )
 
-
-        # ----------------------------------------------------
-        # START RUN TIMER
-        # ----------------------------------------------------
-
         run_start_time = (
 
             time.perf_counter()
 
         )
-
-
-        # ----------------------------------------------------
-        # RUN SIMULATION
-        # ----------------------------------------------------
 
         spike_times, spike_neurons = (
 
@@ -735,41 +526,33 @@ for p_index, p in enumerate(
 
                     network,
 
-
                 I_ext=
 
                     I_EXT,
-
 
                 g_syn=
 
                     G_SYN,
 
-
                 tau_m=
 
                     TAU_M,
-
 
                 tau_D=
 
                     TAU_D,
 
-
                 dt=
 
                     DT,
-
 
                 t_max=
 
                     T_MAX,
 
-
                 stimulus_neuron=
 
                     STIMULUS_NEURON,
-
 
                 stimulus_time=
 
@@ -779,11 +562,6 @@ for p_index, p in enumerate(
 
         )
 
-
-        # ----------------------------------------------------
-        # RUNTIME
-        # ----------------------------------------------------
-
         runtime_seconds = (
 
             time.perf_counter()
@@ -791,11 +569,6 @@ for p_index, p in enumerate(
             - run_start_time
 
         )
-
-
-        # ----------------------------------------------------
-        # CLASSIFY
-        # ----------------------------------------------------
 
         classification = (
 
@@ -807,7 +580,6 @@ for p_index, p in enumerate(
 
         )
 
-
         status = (
 
             classification[
@@ -818,54 +590,35 @@ for p_index, p in enumerate(
 
         )
 
-
-        # ----------------------------------------------------
-        # COUNT OUTCOME
-        # ----------------------------------------------------
-
         if status == "SUCCESS":
-
 
             success_count += 1
 
-
         else:
-
 
             failure_count += 1
 
-
-        # ----------------------------------------------------
-        # SAVE REALIZATION
-        # ----------------------------------------------------
-
         realization_row = {
-
 
             "N":
 
                 N,
 
-
             "p":
 
                 p,
-
 
             "seed":
 
                 seed,
 
-
             "number_of_shortcuts":
 
                 len(shortcuts),
 
-
             "status":
 
                 status,
-
 
             "total_spikes":
 
@@ -875,7 +628,6 @@ for p_index, p in enumerate(
 
                 ],
 
-
             "last_spike_time":
 
                 classification[
@@ -883,7 +635,6 @@ for p_index, p in enumerate(
                     "last_spike_time"
 
                 ],
-
 
             "activity_duration":
 
@@ -893,7 +644,6 @@ for p_index, p in enumerate(
 
                 ],
 
-
             "late_spikes":
 
                 classification[
@@ -902,24 +652,17 @@ for p_index, p in enumerate(
 
                 ],
 
-
             "runtime_seconds":
 
                 runtime_seconds,
 
         }
 
-
         all_realization_results.append(
 
             realization_row
 
         )
-
-
-        # ----------------------------------------------------
-        # PRINT PROGRESS
-        # ----------------------------------------------------
 
         print(
 
@@ -945,13 +688,7 @@ for p_index, p in enumerate(
 
         )
 
-
     print()
-
-
-    # ========================================================
-    # CALCULATE PROBABILITIES
-    # ========================================================
 
     probability_success = (
 
@@ -961,7 +698,6 @@ for p_index, p in enumerate(
 
     )
 
-
     probability_failure = (
 
         failure_count
@@ -970,7 +706,6 @@ for p_index, p in enumerate(
 
     )
 
-
     percent_failure = (
 
         100.0
@@ -978,11 +713,6 @@ for p_index, p in enumerate(
         * probability_failure
 
     )
-
-
-    # --------------------------------------------------------
-    # BINOMIAL STANDARD ERROR
-    # --------------------------------------------------------
 
     standard_error = np.sqrt(
 
@@ -1000,7 +730,6 @@ for p_index, p in enumerate(
 
     )
 
-
     percent_standard_error = (
 
         100.0
@@ -1008,11 +737,6 @@ for p_index, p in enumerate(
         * standard_error
 
     )
-
-
-    # --------------------------------------------------------
-    # p RUNTIME
-    # --------------------------------------------------------
 
     p_runtime = (
 
@@ -1022,63 +746,47 @@ for p_index, p in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # STORE PROBABILITY RESULT
-    # --------------------------------------------------------
-
     probability_row = {
-
 
         "N":
 
             N,
 
-
         "p":
 
             p,
-
 
         "number_of_shortcuts":
 
             number_of_shortcuts,
 
-
         "realizations":
 
             NUM_REALIZATIONS,
-
 
         "success_count":
 
             success_count,
 
-
         "failure_count":
 
             failure_count,
-
 
         "probability_success":
 
             probability_success,
 
-
         "probability_failure":
 
             probability_failure,
-
 
         "percent_failure":
 
             percent_failure,
 
-
         "percent_standard_error":
 
             percent_standard_error,
-
 
         "runtime_seconds":
 
@@ -1086,23 +794,15 @@ for p_index, p in enumerate(
 
     }
 
-
     probability_results.append(
 
         probability_row
 
     )
 
-
-    # --------------------------------------------------------
-    # PRINT p SUMMARY
-    # --------------------------------------------------------
-
     print("\nRESULT")
 
-
     print("-" * 50)
-
 
     print(
 
@@ -1112,7 +812,6 @@ for p_index, p in enumerate(
 
     )
 
-
     print(
 
         "Failures =",
@@ -1120,7 +819,6 @@ for p_index, p in enumerate(
         failure_count,
 
     )
-
 
     print(
 
@@ -1130,7 +828,6 @@ for p_index, p in enumerate(
 
     )
 
-
     print(
 
         "P_failure =",
@@ -1138,7 +835,6 @@ for p_index, p in enumerate(
         f"{probability_failure:.3f}",
 
     )
-
 
     print(
 
@@ -1148,7 +844,6 @@ for p_index, p in enumerate(
 
     )
 
-
     print(
 
         "Standard error =",
@@ -1157,7 +852,6 @@ for p_index, p in enumerate(
 
     )
 
-
     print(
 
         "Runtime for p =",
@@ -1165,11 +859,6 @@ for p_index, p in enumerate(
         f"{p_runtime:.2f} seconds",
 
     )
-
-
-# ============================================================
-# SAVE ALL REALIZATIONS
-# ============================================================
 
 with open(
 
@@ -1180,7 +869,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1196,20 +884,13 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
         all_realization_results
 
     )
-
-
-# ============================================================
-# SAVE PROBABILITY CURVE
-# ============================================================
 
 with open(
 
@@ -1220,7 +901,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1236,9 +916,7 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
@@ -1246,16 +924,9 @@ with open(
 
     )
 
-
-# ============================================================
-# PRINT FINAL PROBABILITY TABLE
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1263,9 +934,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1281,12 +950,9 @@ print(
 
 )
 
-
 print("-" * 65)
 
-
 for row in probability_results:
-
 
     print(
 
@@ -1301,11 +967,6 @@ for row in probability_results:
         f"{row['percent_failure']:10.1f}"
 
     )
-
-
-# ============================================================
-# FIND APPROXIMATE CRITICAL p
-# ============================================================
 
 mixed_rows = [
 
@@ -1325,9 +986,7 @@ mixed_rows = [
 
 ]
 
-
 if len(mixed_rows) > 0:
-
 
     critical_row = min(
 
@@ -1345,9 +1004,7 @@ if len(mixed_rows) > 0:
 
     )
 
-
 else:
-
 
     critical_row = min(
 
@@ -1365,19 +1022,15 @@ else:
 
     )
 
-
 p_critical_estimate = (
 
     critical_row["p"]
 
 )
 
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1385,9 +1038,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1396,7 +1047,6 @@ print(
     p_critical_estimate,
 
 )
-
 
 print(
 
@@ -1410,7 +1060,6 @@ print(
 
 )
 
-
 print(
 
     "Number of shortcuts =",
@@ -1422,11 +1071,6 @@ print(
     ],
 
 )
-
-
-# ============================================================
-# EXTRACT PLOT DATA
-# ============================================================
 
 plot_p = np.array(
 
@@ -1440,7 +1084,6 @@ plot_p = np.array(
 
 )
 
-
 plot_failure = np.array(
 
     [
@@ -1452,7 +1095,6 @@ plot_failure = np.array(
     ]
 
 )
-
 
 plot_error = np.array(
 
@@ -1466,17 +1108,11 @@ plot_error = np.array(
 
 )
 
-
-# ============================================================
-# PLOT FAILURE CURVE
-# ============================================================
-
 plt.figure(
 
     figsize=(8, 6)
 
 )
-
 
 plt.errorbar(
 
@@ -1494,11 +1130,6 @@ plt.errorbar(
 
 )
 
-
-# ------------------------------------------------------------
-# 50% FAILURE LINE
-# ------------------------------------------------------------
-
 plt.axhline(
 
     50.0,
@@ -1508,11 +1139,6 @@ plt.axhline(
     linewidth=1,
 
 )
-
-
-# ------------------------------------------------------------
-# ESTIMATED CRITICAL p
-# ------------------------------------------------------------
 
 plt.axvline(
 
@@ -1524,13 +1150,11 @@ plt.axvline(
 
 )
 
-
 plt.xlabel(
 
     "Shortcut density p"
 
 )
-
 
 plt.ylabel(
 
@@ -1538,13 +1162,11 @@ plt.ylabel(
 
 )
 
-
 plt.title(
 
     "Failure Probability at N = 2000"
 
 )
-
 
 plt.ylim(
 
@@ -1554,7 +1176,6 @@ plt.ylim(
 
 )
 
-
 plt.grid(
 
     True,
@@ -1563,9 +1184,7 @@ plt.grid(
 
 )
 
-
 plt.tight_layout()
-
 
 plt.savefig(
 
@@ -1577,13 +1196,7 @@ plt.savefig(
 
 )
 
-
 plt.show()
-
-
-# ============================================================
-# TOTAL RUNTIME
-# ============================================================
 
 total_runtime = (
 
@@ -1593,16 +1206,9 @@ total_runtime = (
 
 )
 
-
-# ============================================================
-# VALIDATION
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1610,9 +1216,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 expected_runs = (
 
@@ -1621,7 +1225,6 @@ expected_runs = (
     * NUM_REALIZATIONS
 
 )
-
 
 actual_runs = (
 
@@ -1633,12 +1236,9 @@ actual_runs = (
 
 )
 
-
 if actual_runs == expected_runs:
 
-
     print("PASSED")
-
 
     print(
 
@@ -1650,22 +1250,13 @@ if actual_runs == expected_runs:
 
     )
 
-
 else:
-
 
     print("FAILED")
 
-
-# ============================================================
-# NEXT-STEP DIAGNOSTIC
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1673,12 +1264,9 @@ print(
 
 )
 
-
 print("=" * 80)
 
-
 if len(mixed_rows) == 0:
-
 
     print(
 
@@ -1686,16 +1274,13 @@ if len(mixed_rows) == 0:
 
     )
 
-
     print(
 
         "The p range must be changed or refined."
 
     )
 
-
 else:
-
 
     print(
 
@@ -1703,9 +1288,7 @@ else:
 
     )
 
-
     for row in mixed_rows:
-
 
         print(
 
@@ -1717,13 +1300,11 @@ else:
 
         )
 
-
     print(
 
         "\nRefine the next sweep around:"
 
     )
-
 
     print(
 
@@ -1733,16 +1314,9 @@ else:
 
     )
 
-
-# ============================================================
-# OUTPUT FILES
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1750,9 +1324,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1760,13 +1332,11 @@ print(
 
 )
 
-
 print(
 
     ALL_REALIZATIONS_FILE
 
 )
-
 
 print(
 
@@ -1774,13 +1344,11 @@ print(
 
 )
 
-
 print(
 
     PROBABILITY_FILE
 
 )
-
 
 print(
 
@@ -1788,13 +1356,11 @@ print(
 
 )
 
-
 print(
 
     FIGURE_FILE
 
 )
-
 
 print(
 
@@ -1804,18 +1370,14 @@ print(
 
 )
 
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
     "PHASE 12 COMPLETE"
 
 )
-
 
 print("=" * 80)
