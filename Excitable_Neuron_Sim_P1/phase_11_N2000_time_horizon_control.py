@@ -32,11 +32,6 @@ IMPORTANT:
     of persistent activity yet.
 """
 
-
-# ============================================================
-# IMPORTS
-# ============================================================
-
 from pathlib import Path
 
 import csv
@@ -45,28 +40,20 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 from network import (
     build_ring_network,
     add_random_shortcuts,
 )
 
-
 from simulator import (
     run_simulation,
 )
-
-
-# ============================================================
-# PATH SETUP
-# ============================================================
 
 PROJECT_DIR = (
     Path(__file__)
     .resolve()
     .parent
 )
-
 
 RESULTS_DIR = (
 
@@ -78,7 +65,6 @@ RESULTS_DIR = (
 
 )
 
-
 RESULTS_DIR.mkdir(
 
     parents=True,
@@ -86,7 +72,6 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 
 )
-
 
 RESULTS_FILE = (
 
@@ -96,7 +81,6 @@ RESULTS_FILE = (
 
 )
 
-
 SUMMARY_FILE = (
 
     RESULTS_DIR
@@ -104,7 +88,6 @@ SUMMARY_FILE = (
     / "phase11_N2000_time_horizon_summary.csv"
 
 )
-
 
 FIGURE_FILE = (
 
@@ -114,17 +97,7 @@ FIGURE_FILE = (
 
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 2000
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 
@@ -134,59 +107,31 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 
-
-# Long simulation required for N = 2000
-
 T_MAX = 3000.0
-
 
 STIMULUS_NEURON = (
     N // 2
 )
 
-
 STIMULUS_TIME = 10.0
-
-
-# ============================================================
-# CONTROL p VALUES
-# ============================================================
 
 P_VALUES = np.array([
 
-    0.0,       # pure ring
+    0.0,
 
-    0.0005,    # 1 shortcut
+    0.0005,
 
-    0.001,     # 2 shortcuts
+    0.001,
 
-    0.002,     # 4 shortcuts
+    0.002,
 
 ])
 
-
-# ============================================================
-# NUMBER OF REALIZATIONS
-# ============================================================
-
-# Small control experiment only.
-
 NUM_REALIZATIONS = 5
 
-
-# ============================================================
-# FINAL OBSERVATION WINDOW
-# ============================================================
-
 FINAL_WINDOW = 200.0
-
 
 FINAL_WINDOW_START = (
 
@@ -196,17 +141,11 @@ FINAL_WINDOW_START = (
 
 )
 
-
-# ============================================================
-# ACTIVITY ANALYSIS
-# ============================================================
-
 def analyze_activity(
 
     spike_times,
 
 ):
-
 
     spike_times = np.asarray(
 
@@ -216,13 +155,7 @@ def analyze_activity(
 
     )
 
-
-    # --------------------------------------------------------
-    # NO SPIKES
-    # --------------------------------------------------------
-
     if len(spike_times) == 0:
-
 
         return {
 
@@ -230,37 +163,27 @@ def analyze_activity(
 
                 0,
 
-
             "first_spike_time":
 
                 np.nan,
-
 
             "last_spike_time":
 
                 np.nan,
 
-
             "activity_duration":
 
                 0.0,
 
-
             "spikes_in_final_window":
 
                 0,
-
 
             "reached_tmax":
 
                 False,
 
         }
-
-
-    # --------------------------------------------------------
-    # FIRST SPIKE
-    # --------------------------------------------------------
 
     first_spike_time = float(
 
@@ -272,11 +195,6 @@ def analyze_activity(
 
     )
 
-
-    # --------------------------------------------------------
-    # LAST SPIKE
-    # --------------------------------------------------------
-
     last_spike_time = float(
 
         np.max(
@@ -287,11 +205,6 @@ def analyze_activity(
 
     )
 
-
-    # --------------------------------------------------------
-    # ACTIVITY DURATION
-    # --------------------------------------------------------
-
     activity_duration = (
 
         last_spike_time
@@ -299,11 +212,6 @@ def analyze_activity(
         - STIMULUS_TIME
 
     )
-
-
-    # --------------------------------------------------------
-    # FINAL WINDOW SPIKES
-    # --------------------------------------------------------
 
     spikes_in_final_window = int(
 
@@ -317,11 +225,6 @@ def analyze_activity(
 
     )
 
-
-    # --------------------------------------------------------
-    # REACHED SIMULATION END?
-    # --------------------------------------------------------
-
     reached_tmax = (
 
         spikes_in_final_window
@@ -330,33 +233,27 @@ def analyze_activity(
 
     )
 
-
     return {
 
         "total_spikes":
 
             len(spike_times),
 
-
         "first_spike_time":
 
             first_spike_time,
-
 
         "last_spike_time":
 
             last_spike_time,
 
-
         "activity_duration":
 
             activity_duration,
 
-
         "spikes_in_final_window":
 
             spikes_in_final_window,
-
 
         "reached_tmax":
 
@@ -364,13 +261,7 @@ def analyze_activity(
 
     }
 
-
-# ============================================================
-# HEADER
-# ============================================================
-
 print("=" * 80)
-
 
 print(
 
@@ -378,15 +269,11 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print("\nQUESTION")
 
-
 print("-" * 50)
-
 
 print(
 
@@ -396,12 +283,9 @@ print(
 
 )
 
-
 print("\nNETWORK")
 
-
 print("-" * 50)
-
 
 print(
 
@@ -411,12 +295,9 @@ print(
 
 )
 
-
 print("\nSIMULATION")
 
-
 print("-" * 50)
-
 
 print(
 
@@ -426,7 +307,6 @@ print(
 
 )
 
-
 print(
 
     "T_max =",
@@ -434,7 +314,6 @@ print(
     T_MAX,
 
 )
-
 
 print(
 
@@ -444,7 +323,6 @@ print(
 
 )
 
-
 print(
 
     "Stimulus time =",
@@ -452,7 +330,6 @@ print(
     STIMULUS_TIME,
 
 )
-
 
 print(
 
@@ -462,15 +339,11 @@ print(
 
 )
 
-
 print("\nCONTROL p VALUES")
-
 
 print("-" * 50)
 
-
 for p in P_VALUES:
-
 
     print(
 
@@ -482,7 +355,6 @@ for p in P_VALUES:
 
     )
 
-
 print(
 
     "\nRealizations per p =",
@@ -491,23 +363,11 @@ print(
 
 )
 
-
-# ============================================================
-# STORAGE
-# ============================================================
-
 all_results = []
-
-
-# ============================================================
-# BUILD LOCAL RING ONCE
-# ============================================================
 
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -515,9 +375,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 local_network = (
 
@@ -529,13 +387,11 @@ local_network = (
 
 )
 
-
 print(
 
     "Local ring created."
 
 )
-
 
 print(
 
@@ -545,27 +401,15 @@ print(
 
 )
 
-
-# ============================================================
-# START TOTAL TIMER
-# ============================================================
-
 total_start_time = (
 
     time.perf_counter()
 
 )
 
-
-# ============================================================
-# RUN CONTROL EXPERIMENT
-# ============================================================
-
 for p in P_VALUES:
 
-
     p = float(p)
-
 
     expected_shortcuts = int(
 
@@ -577,12 +421,9 @@ for p in P_VALUES:
 
     )
 
-
     print("\n")
 
-
     print("=" * 80)
-
 
     print(
 
@@ -590,9 +431,7 @@ for p in P_VALUES:
 
     )
 
-
     print("=" * 80)
-
 
     print(
 
@@ -602,21 +441,11 @@ for p in P_VALUES:
 
     )
 
-
-    # --------------------------------------------------------
-    # RUN REALIZATIONS
-    # --------------------------------------------------------
-
     for seed in range(
 
         NUM_REALIZATIONS
 
     ):
-
-
-        # ----------------------------------------------------
-        # BUILD NETWORK
-        # ----------------------------------------------------
 
         network, shortcuts = (
 
@@ -626,11 +455,9 @@ for p in P_VALUES:
 
                     local_network,
 
-
                 p=
 
                     p,
-
 
                 seed=
 
@@ -640,21 +467,11 @@ for p in P_VALUES:
 
         )
 
-
-        # ----------------------------------------------------
-        # START RUN TIMER
-        # ----------------------------------------------------
-
         run_start_time = (
 
             time.perf_counter()
 
         )
-
-
-        # ----------------------------------------------------
-        # RUN LONG SIMULATION
-        # ----------------------------------------------------
 
         spike_times, spike_neurons = (
 
@@ -664,41 +481,33 @@ for p in P_VALUES:
 
                     network,
 
-
                 I_ext=
 
                     I_EXT,
-
 
                 g_syn=
 
                     G_SYN,
 
-
                 tau_m=
 
                     TAU_M,
-
 
                 tau_D=
 
                     TAU_D,
 
-
                 dt=
 
                     DT,
-
 
                 t_max=
 
                     T_MAX,
 
-
                 stimulus_neuron=
 
                     STIMULUS_NEURON,
-
 
                 stimulus_time=
 
@@ -708,11 +517,6 @@ for p in P_VALUES:
 
         )
 
-
-        # ----------------------------------------------------
-        # END RUN TIMER
-        # ----------------------------------------------------
-
         runtime_seconds = (
 
             time.perf_counter()
@@ -720,11 +524,6 @@ for p in P_VALUES:
             - run_start_time
 
         )
-
-
-        # ----------------------------------------------------
-        # ANALYZE ACTIVITY
-        # ----------------------------------------------------
 
         analysis = (
 
@@ -736,33 +535,23 @@ for p in P_VALUES:
 
         )
 
-
-        # ----------------------------------------------------
-        # STORE RESULT
-        # ----------------------------------------------------
-
         result = {
-
 
             "N":
 
                 N,
 
-
             "p":
 
                 p,
-
 
             "seed":
 
                 seed,
 
-
             "number_of_shortcuts":
 
                 len(shortcuts),
-
 
             "total_spikes":
 
@@ -772,7 +561,6 @@ for p in P_VALUES:
 
                 ],
 
-
             "first_spike_time":
 
                 analysis[
@@ -780,7 +568,6 @@ for p in P_VALUES:
                     "first_spike_time"
 
                 ],
-
 
             "last_spike_time":
 
@@ -790,7 +577,6 @@ for p in P_VALUES:
 
                 ],
 
-
             "activity_duration":
 
                 analysis[
@@ -798,7 +584,6 @@ for p in P_VALUES:
                     "activity_duration"
 
                 ],
-
 
             "spikes_in_final_window":
 
@@ -808,7 +593,6 @@ for p in P_VALUES:
 
                 ],
 
-
             "reached_tmax":
 
                 analysis[
@@ -817,13 +601,11 @@ for p in P_VALUES:
 
                 ],
 
-
             "runtime_seconds":
 
                 runtime_seconds,
 
         }
-
 
         all_results.append(
 
@@ -831,13 +613,7 @@ for p in P_VALUES:
 
         )
 
-
-        # ----------------------------------------------------
-        # PRINT RESULT
-        # ----------------------------------------------------
-
         if analysis["reached_tmax"]:
-
 
             end_status = (
 
@@ -845,9 +621,7 @@ for p in P_VALUES:
 
             )
 
-
         else:
-
 
             end_status = (
 
@@ -855,46 +629,33 @@ for p in P_VALUES:
 
             )
 
-
         print(
-
 
             f"Seed {seed:2d} | "
 
-
             f"{end_status:13s} | "
-
 
             f"Shortcuts = "
 
             f"{len(shortcuts):2d} | "
 
-
             f"Spikes = "
 
             f"{analysis['total_spikes']:7d} | "
-
 
             f"Last = "
 
             f"{analysis['last_spike_time']:8.2f} | "
 
-
             f"Final-window spikes = "
 
             f"{analysis['spikes_in_final_window']:6d} | "
-
 
             f"Runtime = "
 
             f"{runtime_seconds:6.2f} s"
 
         )
-
-
-# ============================================================
-# SAVE ALL REALIZATIONS
-# ============================================================
 
 with open(
 
@@ -905,7 +666,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -939,9 +699,7 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
@@ -949,19 +707,11 @@ with open(
 
     )
 
-
-# ============================================================
-# BUILD SUMMARY
-# ============================================================
-
 summary_results = []
-
 
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -969,15 +719,11 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 for p in P_VALUES:
 
-
     p = float(p)
-
 
     p_rows = [
 
@@ -994,11 +740,6 @@ for p in P_VALUES:
         )
 
     ]
-
-
-    # --------------------------------------------------------
-    # EXTRACT VALUES
-    # --------------------------------------------------------
 
     last_spike_times = np.array(
 
@@ -1014,7 +755,6 @@ for p in P_VALUES:
 
     )
 
-
     total_spikes = np.array(
 
         [
@@ -1028,7 +768,6 @@ for p in P_VALUES:
         dtype=float,
 
     )
-
 
     runtimes = np.array(
 
@@ -1044,11 +783,6 @@ for p in P_VALUES:
 
     )
 
-
-    # --------------------------------------------------------
-    # COUNT RUNS ACTIVE AT END
-    # --------------------------------------------------------
-
     active_at_end_count = sum(
 
         row["reached_tmax"]
@@ -1057,7 +791,6 @@ for p in P_VALUES:
 
     )
 
-
     died_early_count = (
 
         len(p_rows)
@@ -1065,11 +798,6 @@ for p in P_VALUES:
         - active_at_end_count
 
     )
-
-
-    # --------------------------------------------------------
-    # SUMMARY STATISTICS
-    # --------------------------------------------------------
 
     mean_last_spike_time = float(
 
@@ -1081,7 +809,6 @@ for p in P_VALUES:
 
     )
 
-
     min_last_spike_time = float(
 
         np.min(
@@ -1091,7 +818,6 @@ for p in P_VALUES:
         )
 
     )
-
 
     max_last_spike_time = float(
 
@@ -1103,7 +829,6 @@ for p in P_VALUES:
 
     )
 
-
     mean_total_spikes = float(
 
         np.mean(
@@ -1113,7 +838,6 @@ for p in P_VALUES:
         )
 
     )
-
 
     mean_runtime = float(
 
@@ -1125,18 +849,11 @@ for p in P_VALUES:
 
     )
 
-
-    # --------------------------------------------------------
-    # STORE SUMMARY
-    # --------------------------------------------------------
-
     summary_row = {
-
 
         "p":
 
             p,
-
 
         "number_of_shortcuts":
 
@@ -1150,41 +867,33 @@ for p in P_VALUES:
 
             ),
 
-
         "realizations":
 
             len(p_rows),
-
 
         "active_at_end":
 
             active_at_end_count,
 
-
         "died_early":
 
             died_early_count,
-
 
         "mean_last_spike_time":
 
             mean_last_spike_time,
 
-
         "min_last_spike_time":
 
             min_last_spike_time,
-
 
         "max_last_spike_time":
 
             max_last_spike_time,
 
-
         "mean_total_spikes":
 
             mean_total_spikes,
-
 
         "mean_runtime_seconds":
 
@@ -1192,57 +901,39 @@ for p in P_VALUES:
 
     }
 
-
     summary_results.append(
 
         summary_row
 
     )
 
-
-    # --------------------------------------------------------
-    # PRINT SUMMARY
-    # --------------------------------------------------------
-
     print(
 
-
         f"p = {p:7.4f} | "
-
 
         f"Shortcuts = "
 
         f"{int(round(p * N)):2d} | "
 
-
         f"Active at end = "
 
         f"{active_at_end_count}/{len(p_rows)} | "
-
 
         f"Died early = "
 
         f"{died_early_count}/{len(p_rows)} | "
 
-
         f"Mean last spike = "
 
         f"{mean_last_spike_time:8.2f} | "
-
 
         f"Range = "
 
         f"[{min_last_spike_time:8.2f}, "
 
-
         f"{max_last_spike_time:8.2f}]"
 
     )
-
-
-# ============================================================
-# SAVE SUMMARY
-# ============================================================
 
 with open(
 
@@ -1253,7 +944,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1269,9 +959,7 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
@@ -1279,23 +967,15 @@ with open(
 
     )
 
-
-# ============================================================
-# PLOT ACTIVITY LIFETIME
-# ============================================================
-
 plt.figure(
 
     figsize=(9, 6)
 
 )
 
-
 for p in P_VALUES:
 
-
     p = float(p)
-
 
     p_rows = [
 
@@ -1313,7 +993,6 @@ for p in P_VALUES:
 
     ]
 
-
     x_values = [
 
         p
@@ -1322,7 +1001,6 @@ for p in P_VALUES:
 
     ]
 
-
     y_values = [
 
         row["last_spike_time"]
@@ -1330,7 +1008,6 @@ for p in P_VALUES:
         for row in p_rows
 
     ]
-
 
     plt.scatter(
 
@@ -1341,11 +1018,6 @@ for p in P_VALUES:
         s=70,
 
     )
-
-
-# ------------------------------------------------------------
-# SIMULATION END LINE
-# ------------------------------------------------------------
 
 plt.axhline(
 
@@ -1359,11 +1031,6 @@ plt.axhline(
 
 )
 
-
-# ------------------------------------------------------------
-# FINAL WINDOW START
-# ------------------------------------------------------------
-
 plt.axhline(
 
     FINAL_WINDOW_START,
@@ -1376,13 +1043,11 @@ plt.axhline(
 
 )
 
-
 plt.xlabel(
 
     "Shortcut density p"
 
 )
-
 
 plt.ylabel(
 
@@ -1390,16 +1055,13 @@ plt.ylabel(
 
 )
 
-
 plt.title(
 
     "Activity Lifetime Control at N = 2000"
 
 )
 
-
 plt.legend()
-
 
 plt.grid(
 
@@ -1409,9 +1071,7 @@ plt.grid(
 
 )
 
-
 plt.tight_layout()
-
 
 plt.savefig(
 
@@ -1423,13 +1083,7 @@ plt.savefig(
 
 )
 
-
 plt.show()
-
-
-# ============================================================
-# PURE RING CONTROL INTERPRETATION
-# ============================================================
 
 pure_ring_rows = [
 
@@ -1447,7 +1101,6 @@ pure_ring_rows = [
 
 ]
 
-
 pure_ring_active_at_end = sum(
 
     row["reached_tmax"]
@@ -1455,7 +1108,6 @@ pure_ring_active_at_end = sum(
     for row in pure_ring_rows
 
 )
-
 
 pure_ring_last_spikes = [
 
@@ -1465,12 +1117,9 @@ pure_ring_last_spikes = [
 
 ]
 
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1478,9 +1127,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1488,13 +1135,11 @@ print(
 
 )
 
-
 print(
 
     "Shortcuts = 0"
 
 )
-
 
 print(
 
@@ -1505,7 +1150,6 @@ print(
     f"{len(pure_ring_rows)}",
 
 )
-
 
 print(
 
@@ -1527,16 +1171,9 @@ print(
 
 )
 
-
-# ============================================================
-# AUTOMATIC INTERPRETATION
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1544,12 +1181,9 @@ print(
 
 )
 
-
 print("=" * 80)
 
-
 if pure_ring_active_at_end == 0:
-
 
     pure_ring_max_lifetime = max(
 
@@ -1557,13 +1191,11 @@ if pure_ring_active_at_end == 0:
 
     )
 
-
     print(
 
         "GOOD: The pure ring dies before T_MAX."
 
     )
-
 
     print(
 
@@ -1572,7 +1204,6 @@ if pure_ring_active_at_end == 0:
         pure_ring_max_lifetime,
 
     )
-
 
     print(
 
@@ -1586,7 +1217,6 @@ if pure_ring_active_at_end == 0:
 
     )
 
-
     print(
 
         "\nThe next phase can use this control "
@@ -1595,9 +1225,7 @@ if pure_ring_active_at_end == 0:
 
     )
 
-
 else:
-
 
     print(
 
@@ -1606,7 +1234,6 @@ else:
         "near T_MAX."
 
     )
-
 
     print(
 
@@ -1620,7 +1247,6 @@ else:
 
     )
 
-
     print(
 
         "\nIncrease T_MAX before running "
@@ -1629,11 +1255,6 @@ else:
 
     )
 
-
-# ============================================================
-# RUNTIME SUMMARY
-# ============================================================
-
 total_runtime = (
 
     time.perf_counter()
@@ -1641,7 +1262,6 @@ total_runtime = (
     - total_start_time
 
 )
-
 
 mean_runtime = float(
 
@@ -1659,12 +1279,9 @@ mean_runtime = float(
 
 )
 
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1672,9 +1289,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1684,7 +1299,6 @@ print(
 
 )
 
-
 print(
 
     "Mean runtime per simulation =",
@@ -1692,7 +1306,6 @@ print(
     f"{mean_runtime:.2f} seconds",
 
 )
-
 
 print(
 
@@ -1702,16 +1315,9 @@ print(
 
 )
 
-
-# ============================================================
-# OUTPUT FILES
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1719,9 +1325,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1729,13 +1333,11 @@ print(
 
 )
 
-
 print(
 
     RESULTS_FILE
 
 )
-
 
 print(
 
@@ -1743,13 +1345,11 @@ print(
 
 )
 
-
 print(
 
     SUMMARY_FILE
 
 )
-
 
 print(
 
@@ -1757,25 +1357,20 @@ print(
 
 )
 
-
 print(
 
     FIGURE_FILE
 
 )
 
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
     "PHASE 11 COMPLETE"
 
 )
-
 
 print("=" * 80)
