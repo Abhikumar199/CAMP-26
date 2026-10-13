@@ -16,7 +16,6 @@ PLOT:
            vs
     Number of neurons N
 
-
 IMPORTANT:
 
     For every N:
@@ -39,7 +38,6 @@ IMPORTANT:
 
         6. Plot mean duration ± standard deviation.
 
-
 This experiment tests whether activity lifetime:
 
     - increases with N,
@@ -49,11 +47,6 @@ This experiment tests whether activity lifetime:
 
 The curve is NOT forced to have any particular shape.
 """
-
-
-# ============================================================
-# IMPORTS
-# ============================================================
 
 from pathlib import Path
 import csv
@@ -75,11 +68,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================================
-# PATHS
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 
 RESULTS_DIR = (
@@ -93,30 +81,21 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 )
 
-
 ALL_FILE = (
     RESULTS_DIR
     / "all_realizations.csv"
 )
-
 
 SUMMARY_FILE = (
     RESULTS_DIR
     / "duration_vs_N_summary.csv"
 )
 
-
 FIGURE_FILE = (
     RESULTS_DIR
     / "duration_vs_number_of_neurons.png"
 )
 
-
-# ============================================================
-# EXPERIMENT PARAMETERS
-# ============================================================
-
-# Number of neurons
 N_VALUES = [
 
     100,
@@ -133,31 +112,9 @@ N_VALUES = [
 
 ]
 
-
-# ------------------------------------------------------------
-# FIXED SHORTCUT DENSITY
-# ------------------------------------------------------------
-
 P = 0.10
 
-
-# ------------------------------------------------------------
-# NUMBER OF RANDOM NETWORK REALIZATIONS
-# ------------------------------------------------------------
-
-# Start with 20 for testing.
-#
-# After confirming everything works:
-#
-#     50  = good exploratory result
-#     100 = stronger result
-
 NUM_REALIZATIONS = 50
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 
@@ -167,35 +124,13 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
-
-
-# IMPORTANT:
-#
-# Large N may produce very long activity.
-#
-# We use the same long horizon as Phase 11–13.
 
 T_MAX = 3000.0
 
-
 STIMULUS_TIME = 10.0
 
-
-# ============================================================
-# END-OF-SIMULATION WINDOW
-# ============================================================
-
-# If spikes occur in the final 200 time units,
-# the activity is considered to have reached T_MAX.
-
 FINAL_WINDOW = 200.0
-
 
 FINAL_WINDOW_START = (
 
@@ -204,16 +139,7 @@ FINAL_WINDOW_START = (
 
 )
 
-
-# ============================================================
-# CPU SETTINGS
-# ============================================================
-
 CPU_COUNT = os.cpu_count() or 4
-
-
-# Leave one logical CPU core free
-# so Windows remains responsive.
 
 MAX_WORKERS = max(
 
@@ -223,15 +149,9 @@ MAX_WORKERS = max(
 
 )
 
-
-# ============================================================
-# ANALYZE ONE REALIZATION
-# ============================================================
-
 def analyze_activity(
     spike_times,
 ):
-
 
     spike_times = np.asarray(
 
@@ -241,13 +161,7 @@ def analyze_activity(
 
     )
 
-
-    # --------------------------------------------------------
-    # NO SPIKES
-    # --------------------------------------------------------
-
     if len(spike_times) == 0:
-
 
         return {
 
@@ -255,32 +169,23 @@ def analyze_activity(
 
                 0,
 
-
             "last_spike_time":
 
                 np.nan,
-
 
             "activity_duration":
 
                 0.0,
 
-
             "reached_tmax":
 
                 False,
-
 
             "censored":
 
                 False,
 
         }
-
-
-    # --------------------------------------------------------
-    # LAST SPIKE
-    # --------------------------------------------------------
 
     last_spike_time = float(
 
@@ -292,11 +197,6 @@ def analyze_activity(
 
     )
 
-
-    # --------------------------------------------------------
-    # ACTIVITY DURATION
-    # --------------------------------------------------------
-
     activity_duration = max(
 
         0.0,
@@ -306,11 +206,6 @@ def analyze_activity(
         - STIMULUS_TIME,
 
     )
-
-
-    # --------------------------------------------------------
-    # DID ACTIVITY REACH THE END?
-    # --------------------------------------------------------
 
     spikes_in_final_window = int(
 
@@ -324,7 +219,6 @@ def analyze_activity(
 
     )
 
-
     reached_tmax = (
 
         spikes_in_final_window
@@ -333,20 +227,7 @@ def analyze_activity(
 
     )
 
-
-    # --------------------------------------------------------
-    # CENSORING
-    # --------------------------------------------------------
-
-    # If activity is still present near T_MAX,
-    # we do not know the true lifetime.
-    #
-    # Therefore:
-    #
-    #     true duration >= measured duration
-
     censored = reached_tmax
-
 
     return {
 
@@ -354,21 +235,17 @@ def analyze_activity(
 
             len(spike_times),
 
-
         "last_spike_time":
 
             last_spike_time,
-
 
         "activity_duration":
 
             activity_duration,
 
-
         "reached_tmax":
 
             reached_tmax,
-
 
         "censored":
 
@@ -376,22 +253,11 @@ def analyze_activity(
 
     }
 
-
-# ============================================================
-# WORKER FUNCTION
-# ============================================================
-
 def run_one_realization(
     task,
 ):
 
-
     N, seed = task
-
-
-    # --------------------------------------------------------
-    # BUILD LOCAL RING
-    # --------------------------------------------------------
 
     local_network = (
 
@@ -402,11 +268,6 @@ def run_one_realization(
         )
 
     )
-
-
-    # --------------------------------------------------------
-    # ADD RANDOM SHORTCUTS
-    # --------------------------------------------------------
 
     network, shortcuts = (
 
@@ -424,28 +285,17 @@ def run_one_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # STIMULUS NEURON
-    # --------------------------------------------------------
-
     stimulus_neuron = (
 
         N // 2
 
     )
 
-
-    # --------------------------------------------------------
-    # RUN SIMULATION
-    # --------------------------------------------------------
-
     start_time = (
 
         time.perf_counter()
 
     )
-
 
     spike_times, spike_neurons = (
 
@@ -491,7 +341,6 @@ def run_one_realization(
 
     )
 
-
     runtime = (
 
         time.perf_counter()
@@ -499,11 +348,6 @@ def run_one_realization(
         - start_time
 
     )
-
-
-    # --------------------------------------------------------
-    # ANALYZE ACTIVITY
-    # --------------------------------------------------------
 
     result = (
 
@@ -515,32 +359,23 @@ def run_one_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # RETURN RESULT
-    # --------------------------------------------------------
-
     return {
 
         "N":
 
             N,
 
-
         "p":
 
             P,
-
 
         "seed":
 
             seed,
 
-
         "number_of_shortcuts":
 
             len(shortcuts),
-
 
         "total_spikes":
 
@@ -550,7 +385,6 @@ def run_one_realization(
 
             ],
 
-
         "last_spike_time":
 
             result[
@@ -558,7 +392,6 @@ def run_one_realization(
                 "last_spike_time"
 
             ],
-
 
         "activity_duration":
 
@@ -568,7 +401,6 @@ def run_one_realization(
 
             ],
 
-
         "reached_tmax":
 
             result[
@@ -576,7 +408,6 @@ def run_one_realization(
                 "reached_tmax"
 
             ],
-
 
         "censored":
 
@@ -586,23 +417,15 @@ def run_one_realization(
 
             ],
 
-
         "runtime_seconds":
 
             runtime,
 
     }
 
-
-# ============================================================
-# MAIN EXPERIMENT
-# ============================================================
-
 def main():
 
-
     print("=" * 80)
-
 
     print(
 
@@ -610,14 +433,11 @@ def main():
 
     )
 
-
     print("=" * 80)
-
 
     print("\nQUESTION")
 
     print("-" * 50)
-
 
     print(
 
@@ -625,18 +445,15 @@ def main():
 
     )
 
-
     print(
 
         "when shortcut density p is fixed?"
 
     )
 
-
     print("\nFIXED PARAMETERS")
 
     print("-" * 50)
-
 
     print(
 
@@ -646,7 +463,6 @@ def main():
 
     )
 
-
     print(
 
         "N values =",
@@ -654,7 +470,6 @@ def main():
         N_VALUES,
 
     )
-
 
     print(
 
@@ -664,7 +479,6 @@ def main():
 
     )
 
-
     print(
 
         "T_MAX =",
@@ -673,11 +487,9 @@ def main():
 
     )
 
-
     print("\nCPU")
 
     print("-" * 50)
-
 
     print(
 
@@ -687,7 +499,6 @@ def main():
 
     )
 
-
     print(
 
         "Worker processes =",
@@ -696,33 +507,15 @@ def main():
 
     )
 
-
-    # ========================================================
-    # CREATE TASKS
-    # ========================================================
-
     tasks = []
 
-
     for N in N_VALUES:
-
 
         for realization in range(
 
             NUM_REALIZATIONS
 
         ):
-
-
-            # Unique deterministic seed
-            #
-            # Example:
-            #
-            # N=100, realization=0
-            #     seed = 100000
-            #
-            # N=500, realization=3
-            #     seed = 500003
 
             seed = (
 
@@ -731,7 +524,6 @@ def main():
                 + realization
 
             )
-
 
             tasks.append(
 
@@ -745,11 +537,9 @@ def main():
 
             )
 
-
     print("\nTOTAL SIMULATIONS")
 
     print("-" * 50)
-
 
     print(
 
@@ -757,13 +547,7 @@ def main():
 
     )
 
-
-    # ========================================================
-    # RUN PARALLEL SIMULATIONS
-    # ========================================================
-
     all_results = []
-
 
     experiment_start = (
 
@@ -771,14 +555,11 @@ def main():
 
     )
 
-
     print("\nRUNNING SIMULATIONS")
 
     print("-" * 50)
 
-
     completed = 0
-
 
     with ProcessPoolExecutor(
 
@@ -788,9 +569,7 @@ def main():
 
     ) as executor:
 
-
         future_to_task = {
-
 
             executor.submit(
 
@@ -802,18 +581,15 @@ def main():
 
             task
 
-
             for task in tasks
 
         }
-
 
         for future in as_completed(
 
             future_to_task
 
         ):
-
 
             task = (
 
@@ -825,12 +601,9 @@ def main():
 
             )
 
-
             N, seed = task
 
-
             try:
-
 
                 result = (
 
@@ -838,16 +611,13 @@ def main():
 
                 )
 
-
                 all_results.append(
 
                     result
 
                 )
 
-
                 completed += 1
-
 
                 print(
 
@@ -873,16 +643,13 @@ def main():
 
                 )
 
-
             except Exception as error:
-
 
                 print(
 
                     "\nERROR"
 
                 )
-
 
                 print(
 
@@ -892,7 +659,6 @@ def main():
 
                 )
 
-
                 print(
 
                     "seed =",
@@ -901,17 +667,11 @@ def main():
 
                 )
 
-
                 print(
 
                     error
 
                 )
-
-
-    # ========================================================
-    # SORT RESULTS
-    # ========================================================
 
     all_results.sort(
 
@@ -926,11 +686,6 @@ def main():
             )
 
     )
-
-
-    # ========================================================
-    # SAVE ALL REALIZATIONS
-    # ========================================================
 
     fieldnames = [
 
@@ -956,7 +711,6 @@ def main():
 
     ]
 
-
     with open(
 
         ALL_FILE,
@@ -966,7 +720,6 @@ def main():
         newline="",
 
     ) as file:
-
 
         writer = csv.DictWriter(
 
@@ -978,9 +731,7 @@ def main():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
 
@@ -988,13 +739,7 @@ def main():
 
         )
 
-
-    # ========================================================
-    # CALCULATE SUMMARY FOR EACH N
-    # ========================================================
-
     summary_results = []
-
 
     print("\n")
 
@@ -1008,9 +753,7 @@ def main():
 
     print("=" * 80)
 
-
     for N in N_VALUES:
-
 
         rows = [
 
@@ -1021,7 +764,6 @@ def main():
             if row["N"] == N
 
         ]
-
 
         durations = np.array(
 
@@ -1041,7 +783,6 @@ def main():
 
         )
 
-
         reached_tmax = np.array(
 
             [
@@ -1060,11 +801,6 @@ def main():
 
         )
 
-
-        # ----------------------------------------------------
-        # STATISTICS
-        # ----------------------------------------------------
-
         mean_duration = float(
 
             np.mean(
@@ -1074,7 +810,6 @@ def main():
             )
 
         )
-
 
         std_duration = float(
 
@@ -1088,7 +823,6 @@ def main():
 
         )
 
-
         median_duration = float(
 
             np.median(
@@ -1098,7 +832,6 @@ def main():
             )
 
         )
-
 
         min_duration = float(
 
@@ -1110,7 +843,6 @@ def main():
 
         )
 
-
         max_duration = float(
 
             np.max(
@@ -1120,7 +852,6 @@ def main():
             )
 
         )
-
 
         fraction_reached_tmax = float(
 
@@ -1132,7 +863,6 @@ def main():
 
         )
 
-
         num_reached_tmax = int(
 
             np.sum(
@@ -1143,53 +873,43 @@ def main():
 
         )
 
-
         summary = {
 
             "N":
 
                 N,
 
-
             "p":
 
                 P,
-
 
             "num_realizations":
 
                 len(rows),
 
-
             "mean_duration":
 
                 mean_duration,
-
 
             "std_duration":
 
                 std_duration,
 
-
             "median_duration":
 
                 median_duration,
-
 
             "min_duration":
 
                 min_duration,
 
-
             "max_duration":
 
                 max_duration,
 
-
             "num_reached_tmax":
 
                 num_reached_tmax,
-
 
             "fraction_reached_tmax":
 
@@ -1197,20 +917,17 @@ def main():
 
         }
 
-
         summary_results.append(
 
             summary
 
         )
 
-
         print(
 
             f"\nN = {N}"
 
         )
-
 
         print(
 
@@ -1220,7 +937,6 @@ def main():
 
         )
 
-
         print(
 
             f"Std duration    = "
@@ -1229,7 +945,6 @@ def main():
 
         )
 
-
         print(
 
             f"Median duration = "
@@ -1237,7 +952,6 @@ def main():
             f"{median_duration:.2f}"
 
         )
-
 
         print(
 
@@ -1252,11 +966,6 @@ def main():
             f"({100 * fraction_reached_tmax:.1f}%)"
 
         )
-
-
-    # ========================================================
-    # SAVE SUMMARY CSV
-    # ========================================================
 
     summary_fieldnames = [
 
@@ -1282,7 +991,6 @@ def main():
 
     ]
 
-
     with open(
 
         SUMMARY_FILE,
@@ -1292,7 +1000,6 @@ def main():
         newline="",
 
     ) as file:
-
 
         writer = csv.DictWriter(
 
@@ -1304,19 +1011,13 @@ def main():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
 
             summary_results
 
         )
-
-       # ========================================================
-    # PREPARE DATA FOR BOXPLOT
-    # ========================================================
 
     boxplot_data = []
 
@@ -1336,25 +1037,14 @@ def main():
             durations_for_N
         )
 
-
-    # ========================================================
-    # MAXIMUM OBSERVABLE DURATION
-    # ========================================================
-
     MAX_OBSERVABLE_DURATION = (
         T_MAX
         - STIMULUS_TIME
     )
 
-
-    # ========================================================
-    # CREATE BOXPLOT
-    # ========================================================
-
     plt.figure(
         figsize=(10, 6)
     )
-
 
     plt.boxplot(
 
@@ -1375,18 +1065,7 @@ def main():
 
     )
 
-
-    # ========================================================
-    # ADD INDIVIDUAL REALIZATIONS
-    # ========================================================
-
-    # This shows every network realization.
-    #
-    # A small horizontal jitter prevents points
-    # from lying exactly on top of each other.
-
     rng = np.random.default_rng(42)
-
 
     for position, durations in enumerate(
         boxplot_data,
@@ -1403,7 +1082,6 @@ def main():
 
         )
 
-
         plt.scatter(
 
             position + jitter,
@@ -1417,11 +1095,6 @@ def main():
             zorder=3,
 
         )
-
-
-    # ========================================================
-    # OBSERVATION LIMIT
-    # ========================================================
 
     plt.axhline(
 
@@ -1438,11 +1111,6 @@ def main():
 
     )
 
-
-    # ========================================================
-    # AXIS LABELS
-    # ========================================================
-
     plt.xlabel(
 
         "Number of neurons, N",
@@ -1451,7 +1119,6 @@ def main():
 
     )
 
-
     plt.ylabel(
 
         "Activity duration (ms)",
@@ -1459,11 +1126,6 @@ def main():
         fontsize=13,
 
     )
-
-
-    # ========================================================
-    # TITLE
-    # ========================================================
 
     plt.title(
 
@@ -1475,19 +1137,9 @@ def main():
 
     )
 
-
-    # ========================================================
-    # Y-AXIS
-    # ========================================================
-
     plt.ylim(
         bottom=0
     )
-
-
-    # ========================================================
-    # GRID
-    # ========================================================
 
     plt.grid(
 
@@ -1497,26 +1149,11 @@ def main():
 
     )
 
-
-    # ========================================================
-    # LEGEND
-    # ========================================================
-
     plt.legend(
         fontsize=10
     )
 
-
-    # ========================================================
-    # FINALIZE
-    # ========================================================
-
     plt.tight_layout()
-
-
-    # ========================================================
-    # SAVE
-    # ========================================================
 
     BOX_FIGURE_FILE = (
 
@@ -1525,7 +1162,6 @@ def main():
         / "duration_vs_N_boxplot.png"
 
     )
-
 
     plt.savefig(
 
@@ -1537,16 +1173,7 @@ def main():
 
     )
 
-
-    # ========================================================
-    # SHOW
-    # ========================================================
-
     plt.show()
-
-    # ========================================================
-    # FINAL RUNTIME
-    # ========================================================
 
     total_runtime = (
         time.perf_counter()
@@ -1571,11 +1198,6 @@ def main():
 
     print("\nFigure:")
     print(FIGURE_FILE)
-
-
-# ============================================================
-# WINDOWS MULTIPROCESSING ENTRY POINT
-# ============================================================
 
 if __name__ == "__main__":
     main()
