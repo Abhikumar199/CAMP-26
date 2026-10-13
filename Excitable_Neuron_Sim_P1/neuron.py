@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def update_voltage(V, I_ext, tau_m, dt):
     """
     Evolve the membrane voltage for one time step.
@@ -21,7 +20,6 @@ def update_voltage(V, I_ext, tau_m, dt):
 
     return V_new
 
-
 def apply_synaptic_input(V, g_syn, n_inputs=1):
     """
     Apply one or more instantaneous synaptic pulses.
@@ -30,7 +28,6 @@ def apply_synaptic_input(V, g_syn, n_inputs=1):
     """
 
     return V + n_inputs * g_syn
-
 
 def check_and_reset(V, threshold=1.0, reset=0.0):
     """
@@ -49,7 +46,6 @@ def check_and_reset(V, threshold=1.0, reset=0.0):
         return reset, True
 
     return V, False
-
 
 def analytical_recovery_time(
     I_ext,
