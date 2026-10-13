@@ -42,11 +42,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================================
-# PATH SETUP
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 
 RESULTS_DIR = (
@@ -65,17 +60,7 @@ RESULTS_FILE = (
     / "phase10_N2000_benchmark.csv"
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 2000
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 
@@ -85,11 +70,6 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 
 T_MAX = 200.0
@@ -98,25 +78,7 @@ STIMULUS_TIME = 10.0
 
 STIMULUS_NEURON = N // 2
 
-
-# ============================================================
-# BENCHMARK PARAMETERS
-# ============================================================
-
-# Start small.
-#
-# Do NOT use 100 or 2000 realizations yet.
-
 NUM_REALIZATIONS = 10
-
-
-# Initial coarse p values.
-#
-# We are only checking:
-#
-#     runtime
-#     stability
-#     approximate behavior
 
 P_VALUES = np.array([
 
@@ -132,19 +94,9 @@ P_VALUES = np.array([
 
 ])
 
-
-# ============================================================
-# CLASSIFICATION PARAMETERS
-# ============================================================
-
 FINAL_WINDOW_START = 180.0
 
 FINAL_WINDOW_END = T_MAX
-
-
-# ============================================================
-# CLASSIFY ONE REALIZATION
-# ============================================================
 
 def classify_realization(
     spike_times,
@@ -154,11 +106,6 @@ def classify_realization(
         spike_times,
         dtype=float,
     )
-
-
-    # --------------------------------------------------------
-    # NO SPIKES
-    # --------------------------------------------------------
 
     if len(spike_times) == 0:
 
@@ -177,21 +124,11 @@ def classify_realization(
                 0,
         }
 
-
-    # --------------------------------------------------------
-    # LAST SPIKE
-    # --------------------------------------------------------
-
     last_spike_time = float(
         np.max(
             spike_times
         )
     )
-
-
-    # --------------------------------------------------------
-    # SPIKES IN FINAL WINDOW
-    # --------------------------------------------------------
 
     late_spikes = int(
 
@@ -213,11 +150,6 @@ def classify_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # SUCCESS / FAILURE
-    # --------------------------------------------------------
-
     if late_spikes > 0:
 
         status = "SUCCESS"
@@ -225,7 +157,6 @@ def classify_realization(
     else:
 
         status = "FAILURE"
-
 
     return {
 
@@ -242,11 +173,6 @@ def classify_realization(
             late_spikes,
     }
 
-
-# ============================================================
-# HEADER
-# ============================================================
-
 print("=" * 80)
 
 print(
@@ -254,7 +180,6 @@ print(
 )
 
 print("=" * 80)
-
 
 print("\nNETWORK")
 
@@ -264,7 +189,6 @@ print(
     "N =",
     N,
 )
-
 
 print("\nNEURON PARAMETERS")
 
@@ -290,7 +214,6 @@ print(
     TAU_D,
 )
 
-
 print("\nSIMULATION")
 
 print("-" * 50)
@@ -310,7 +233,6 @@ print(
     NUM_REALIZATIONS,
 )
 
-
 print("\np VALUES")
 
 print("-" * 50)
@@ -319,17 +241,7 @@ print(
     P_VALUES
 )
 
-
-# ============================================================
-# STORAGE
-# ============================================================
-
 all_results = []
-
-
-# ============================================================
-# BUILD LOCAL RING ONCE
-# ============================================================
 
 print("\n")
 
@@ -341,11 +253,9 @@ print(
 
 print("=" * 80)
 
-
 local_network = (
     build_ring_network(N)
 )
-
 
 print(
     "Local ring created."
@@ -356,24 +266,13 @@ print(
     2 * N,
 )
 
-
-# ============================================================
-# TOTAL BENCHMARK TIMER
-# ============================================================
-
 benchmark_start_time = (
     time.perf_counter()
 )
 
-
-# ============================================================
-# RUN p VALUES
-# ============================================================
-
 for p_index, p in enumerate(
     P_VALUES
 ):
-
 
     print("\n")
 
@@ -385,42 +284,28 @@ for p_index, p in enumerate(
 
     print("=" * 80)
 
-
     expected_shortcuts = int(
         round(
             p * N
         )
     )
 
-
     print(
         "Expected shortcuts =",
         expected_shortcuts,
     )
 
-
     p_start_time = (
         time.perf_counter()
     )
-
 
     success_count = 0
 
     failure_count = 0
 
-
-    # ========================================================
-    # REALIZATIONS
-    # ========================================================
-
     for seed in range(
         NUM_REALIZATIONS
     ):
-
-
-        # ----------------------------------------------------
-        # BUILD EXACT NETWORK
-        # ----------------------------------------------------
 
         network, shortcuts = (
             add_random_shortcuts(
@@ -436,19 +321,9 @@ for p_index, p in enumerate(
             )
         )
 
-
-        # ----------------------------------------------------
-        # START TIMER
-        # ----------------------------------------------------
-
         run_start_time = (
             time.perf_counter()
         )
-
-
-        # ----------------------------------------------------
-        # RUN SIMULATION
-        # ----------------------------------------------------
 
         spike_times, spike_neurons = (
             run_simulation(
@@ -482,11 +357,6 @@ for p_index, p in enumerate(
             )
         )
 
-
-        # ----------------------------------------------------
-        # END TIMER
-        # ----------------------------------------------------
-
         runtime_seconds = (
 
             time.perf_counter()
@@ -495,28 +365,17 @@ for p_index, p in enumerate(
 
         )
 
-
-        # ----------------------------------------------------
-        # CLASSIFY
-        # ----------------------------------------------------
-
         classification = (
             classify_realization(
                 spike_times
             )
         )
 
-
         status = (
             classification[
                 "status"
             ]
         )
-
-
-        # ----------------------------------------------------
-        # COUNT OUTCOMES
-        # ----------------------------------------------------
 
         if status == "SUCCESS":
 
@@ -525,11 +384,6 @@ for p_index, p in enumerate(
         else:
 
             failure_count += 1
-
-
-        # ----------------------------------------------------
-        # SAVE RESULT
-        # ----------------------------------------------------
 
         result = {
 
@@ -567,15 +421,9 @@ for p_index, p in enumerate(
                 runtime_seconds,
         }
 
-
         all_results.append(
             result
         )
-
-
-        # ----------------------------------------------------
-        # PRINT RESULT
-        # ----------------------------------------------------
 
         print(
 
@@ -600,11 +448,6 @@ for p_index, p in enumerate(
 
         )
 
-
-    # ========================================================
-    # p SUMMARY
-    # ========================================================
-
     p_runtime = (
 
         time.perf_counter()
@@ -612,7 +455,6 @@ for p_index, p in enumerate(
         - p_start_time
 
     )
-
 
     probability_success = (
 
@@ -622,7 +464,6 @@ for p_index, p in enumerate(
 
     )
 
-
     probability_failure = (
 
         failure_count
@@ -630,7 +471,6 @@ for p_index, p in enumerate(
         / NUM_REALIZATIONS
 
     )
-
 
     p_runtimes = [
 
@@ -644,13 +484,11 @@ for p_index, p in enumerate(
         )
     ]
 
-
     mean_runtime = float(
         np.mean(
             p_runtimes
         )
     )
-
 
     print("\nSUMMARY")
 
@@ -686,11 +524,6 @@ for p_index, p in enumerate(
         f"{p_runtime:.2f} s",
     )
 
-
-# ============================================================
-# TOTAL BENCHMARK TIME
-# ============================================================
-
 total_benchmark_time = (
 
     time.perf_counter()
@@ -699,17 +532,11 @@ total_benchmark_time = (
 
 )
 
-
-# ============================================================
-# SAVE RESULTS
-# ============================================================
-
 with open(
     RESULTS_FILE,
     "w",
     newline="",
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -728,18 +555,11 @@ with open(
         ],
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
         all_results
     )
-
-
-# ============================================================
-# FINAL SUMMARY TABLE
-# ============================================================
 
 print("\n")
 
@@ -751,9 +571,7 @@ print(
 
 print("=" * 80)
 
-
 for p in P_VALUES:
-
 
     p_rows = [
 
@@ -767,7 +585,6 @@ for p in P_VALUES:
         )
     ]
 
-
     successes = sum(
 
         row["status"]
@@ -777,7 +594,6 @@ for p in P_VALUES:
 
     )
 
-
     failures = sum(
 
         row["status"]
@@ -786,7 +602,6 @@ for p in P_VALUES:
         for row in p_rows
 
     )
-
 
     mean_runtime = float(
 
@@ -803,7 +618,6 @@ for p in P_VALUES:
         )
 
     )
-
 
     print(
 
@@ -823,11 +637,6 @@ for p in P_VALUES:
 
     )
 
-
-# ============================================================
-# RUNTIME PROJECTION
-# ============================================================
-
 all_runtimes = [
 
     row["runtime_seconds"]
@@ -836,7 +645,6 @@ all_runtimes = [
 
 ]
 
-
 overall_mean_runtime = float(
 
     np.mean(
@@ -844,7 +652,6 @@ overall_mean_runtime = float(
     )
 
 )
-
 
 print("\n")
 
@@ -856,19 +663,16 @@ print(
 
 print("=" * 80)
 
-
 print(
     "Mean runtime per realization =",
     f"{overall_mean_runtime:.2f} seconds",
 )
-
 
 for number_of_runs in [
     100,
     500,
     2000,
 ]:
-
 
     projected_seconds = (
 
@@ -878,7 +682,6 @@ for number_of_runs in [
 
     )
 
-
     projected_minutes = (
 
         projected_seconds
@@ -887,7 +690,6 @@ for number_of_runs in [
 
     )
 
-
     projected_hours = (
 
         projected_minutes
@@ -895,7 +697,6 @@ for number_of_runs in [
         / 60.0
 
     )
-
 
     print(
 
@@ -907,11 +708,6 @@ for number_of_runs in [
 
     )
 
-
-# ============================================================
-# VALIDATION
-# ============================================================
-
 print("\n")
 
 print("=" * 80)
@@ -922,7 +718,6 @@ print(
 
 print("=" * 80)
 
-
 expected_total_runs = (
 
     len(P_VALUES)
@@ -931,12 +726,9 @@ expected_total_runs = (
 
 )
 
-
 if len(all_results) == expected_total_runs:
 
-
     print("PASSED")
-
 
     print(
 
@@ -946,16 +738,9 @@ if len(all_results) == expected_total_runs:
 
     )
 
-
 else:
 
-
     print("FAILED")
-
-
-# ============================================================
-# OUTPUT
-# ============================================================
 
 print("\n")
 
@@ -967,17 +752,14 @@ print(
 
 print("=" * 80)
 
-
 print(
     RESULTS_FILE
 )
-
 
 print(
     "\nTotal benchmark runtime =",
     f"{total_benchmark_time:.2f} seconds",
 )
-
 
 print("\n")
 
