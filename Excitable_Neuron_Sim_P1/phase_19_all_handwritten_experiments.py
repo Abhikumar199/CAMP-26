@@ -13,7 +13,6 @@ Uses existing:
     simulator.py
         run_simulation()
 
-
 EXPERIMENT I
 ------------
 
@@ -24,7 +23,6 @@ stimulus time = 100 ms
 Output:
     Raster plot
     Firing rate vs time
-
 
 EXPERIMENT II
 -------------
@@ -39,7 +37,6 @@ g_syn = 0.4
 Output:
     Raster plot
     Firing rate vs time
-
 
 EXPERIMENT III
 --------------
@@ -65,7 +62,6 @@ Output:
     Mean firing rate vs p
     Five connected curves
 
-
 EXPERIMENT IV
 -------------
 
@@ -80,11 +76,6 @@ Output:
     Raster plot
     Firing rate vs time
 """
-
-
-# ============================================================
-# IMPORTS
-# ============================================================
 
 from pathlib import Path
 import csv
@@ -106,11 +97,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================================
-# PATHS
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 
 RESULTS_DIR = (
@@ -124,30 +110,15 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 )
 
-
-# ============================================================
-# COMMON PARAMETERS
-# ============================================================
-
 TAU_M = 10.0
 
 TAU_D = 2.0
 
 DT = 0.01
 
-
-# ============================================================
-# FIRING RATE VS TIME PARAMETERS
-# ============================================================
-
 RATE_BIN_WIDTH = 1.0
 
 SMOOTH_WINDOW = 5
-
-
-# ============================================================
-# EXPERIMENT III PARAMETERS
-# ============================================================
 
 EXP3_N = 250
 
@@ -155,18 +126,13 @@ EXP3_STIMULUS_TIME = 10.0
 
 EXP3_T_MAX = 2000.0
 
-
-# p = 0.00, 0.05, 0.10, ..., 1.00
-
 EXP3_P_VALUES = np.arange(
     0.0,
     1.0001,
     0.05,
 )
 
-
 EXP3_NUM_REALIZATIONS = 100
-
 
 EXP3_PARAMETER_PAIRS = [
 
@@ -182,11 +148,6 @@ EXP3_PARAMETER_PAIRS = [
 
 ]
 
-
-# ============================================================
-# CPU SETTINGS
-# ============================================================
-
 CPU_COUNT = os.cpu_count() or 4
 
 MAX_WORKERS = max(
@@ -194,35 +155,16 @@ MAX_WORKERS = max(
     CPU_COUNT - 1,
 )
 
-
-# ============================================================
-# CALCULATE FIRING RATE VS TIME
-#
-# Used by:
-#
-#     Experiment I
-#     Experiment II
-#     Experiment IV
-#
-# Same idea as Phase 15.
-# ============================================================
-
 def calculate_firing_rate_vs_time(
     spike_times,
     N,
     t_max,
 ):
 
-
     spike_times = np.asarray(
         spike_times,
         dtype=float,
     )
-
-
-    # --------------------------------------------------------
-    # CREATE TIME BINS
-    # --------------------------------------------------------
 
     bin_edges = np.arange(
 
@@ -234,11 +176,6 @@ def calculate_firing_rate_vs_time(
 
     )
 
-
-    # --------------------------------------------------------
-    # COUNT ALL NETWORK SPIKES IN EACH BIN
-    # --------------------------------------------------------
-
     spike_counts, _ = np.histogram(
 
         spike_times,
@@ -247,11 +184,6 @@ def calculate_firing_rate_vs_time(
 
     )
 
-
-    # --------------------------------------------------------
-    # BIN CENTRES
-    # --------------------------------------------------------
-
     rate_times = (
 
         bin_edges[:-1]
@@ -259,15 +191,6 @@ def calculate_firing_rate_vs_time(
         + RATE_BIN_WIDTH / 2.0
 
     )
-
-
-    # --------------------------------------------------------
-    # NORMALIZED WHOLE-NETWORK FIRING RATE
-    #
-    #                spikes in time bin
-    # r(t) = -----------------------------------
-    #         N neurons × time-bin width
-    # --------------------------------------------------------
 
     population_rate = (
 
@@ -282,13 +205,7 @@ def calculate_firing_rate_vs_time(
 
     )
 
-
-    # --------------------------------------------------------
-    # SMOOTH FIRING RATE
-    # --------------------------------------------------------
-
     if SMOOTH_WINDOW > 1:
-
 
         kernel = (
 
@@ -300,7 +217,6 @@ def calculate_firing_rate_vs_time(
 
         )
 
-
         smoothed_rate = np.convolve(
 
             population_rate,
@@ -311,28 +227,14 @@ def calculate_firing_rate_vs_time(
 
         )
 
-
     else:
 
-
         smoothed_rate = population_rate
-
 
     return (
         rate_times,
         smoothed_rate,
     )
-
-
-# ============================================================
-# RUN RASTER + FIRING RATE EXPERIMENT
-#
-# Used for:
-#
-#     Experiment I
-#     Experiment II
-#     Experiment IV
-# ============================================================
 
 def run_raster_firing_experiment(
 
@@ -354,7 +256,6 @@ def run_raster_firing_experiment(
 
 ):
 
-
     print("\n")
 
     print("=" * 90)
@@ -365,57 +266,44 @@ def run_raster_firing_experiment(
 
     print("=" * 90)
 
-
     print(
         "N =",
         N,
     )
-
 
     print(
         "p =",
         p,
     )
 
-
     print(
         "stimulus time =",
         stimulus_time,
     )
-
 
     print(
         "I_ext =",
         I_ext,
     )
 
-
     print(
         "g_syn =",
         g_syn,
     )
-
 
     print(
         "T_MAX =",
         t_max,
     )
 
-
     print(
         "seed =",
         seed,
     )
 
-
-    # ========================================================
-    # BUILD NETWORK
-    # ========================================================
-
     local_network = build_ring_network(
         N
     )
-
 
     network, shortcuts = add_random_shortcuts(
 
@@ -428,24 +316,16 @@ def run_raster_firing_experiment(
 
     )
 
-
     print(
         "Number of shortcuts =",
         len(shortcuts),
     )
 
-
-    # ========================================================
-    # RUN SIMULATION
-    # ========================================================
-
     print(
         "Running simulation..."
     )
 
-
     start_time = time.perf_counter()
-
 
     spike_times, spike_neurons = run_simulation(
 
@@ -478,7 +358,6 @@ def run_raster_firing_experiment(
 
     )
 
-
     runtime = (
 
         time.perf_counter()
@@ -486,11 +365,6 @@ def run_raster_firing_experiment(
         - start_time
 
     )
-
-
-    # ========================================================
-    # CONVERT TO ARRAYS
-    # ========================================================
 
     spike_times = np.asarray(
 
@@ -500,7 +374,6 @@ def run_raster_firing_experiment(
 
     )
 
-
     spike_neurons = np.asarray(
 
         spike_neurons,
@@ -509,41 +382,27 @@ def run_raster_firing_experiment(
 
     )
 
-
-    # ========================================================
-    # PRINT RESULTS
-    # ========================================================
-
     print(
         "Total spikes =",
         len(spike_times),
     )
 
-
     if len(spike_times) > 0:
-
 
         print(
             "First spike =",
             f"{np.min(spike_times):.2f}",
         )
 
-
         print(
             "Last spike =",
             f"{np.max(spike_times):.2f}",
         )
 
-
     print(
         "Runtime =",
         f"{runtime:.2f} seconds",
     )
-
-
-    # ========================================================
-    # CALCULATE FIRING RATE VS TIME
-    # ========================================================
 
     rate_times, firing_rate = (
 
@@ -561,11 +420,6 @@ def run_raster_firing_experiment(
         )
 
     )
-
-
-    # ========================================================
-    # CREATE FIGURE
-    # ========================================================
 
     fig, axes = plt.subplots(
 
@@ -593,11 +447,6 @@ def run_raster_firing_experiment(
 
     )
 
-
-    # ========================================================
-    # TOP: RASTER PLOT
-    # ========================================================
-
     axes[0].scatter(
 
         spike_times,
@@ -610,17 +459,14 @@ def run_raster_firing_experiment(
 
     )
 
-
     axes[0].set_ylabel(
         "Neuron index"
     )
-
 
     axes[0].set_ylim(
         0,
         N,
     )
-
 
     axes[0].set_title(
 
@@ -638,11 +484,6 @@ def run_raster_firing_experiment(
 
     )
 
-
-    # ========================================================
-    # BOTTOM: FIRING RATE VS TIME
-    # ========================================================
-
     axes[1].plot(
 
         rate_times,
@@ -653,26 +494,18 @@ def run_raster_firing_experiment(
 
     )
 
-
     axes[1].set_xlabel(
         "Time"
     )
-
 
     axes[1].set_ylabel(
         "Normalized firing rate"
     )
 
-
     axes[1].set_xlim(
         0,
         t_max,
     )
-
-
-    # ========================================================
-    # SAVE FIGURE
-    # ========================================================
 
     safe_name = (
 
@@ -684,7 +517,6 @@ def run_raster_firing_experiment(
 
     )
 
-
     figure_file = (
 
         RESULTS_DIR
@@ -693,9 +525,7 @@ def run_raster_firing_experiment(
 
     )
 
-
     plt.tight_layout()
-
 
     plt.savefig(
 
@@ -707,24 +537,15 @@ def run_raster_firing_experiment(
 
     )
 
-
     plt.show()
-
 
     print(
         "Figure saved to:"
     )
 
-
     print(
         figure_file
     )
-
-
-# ============================================================
-# EXPERIMENT III:
-# CALCULATE MEAN FIRING RATE
-# ============================================================
 
 def calculate_mean_firing_rate(
 
@@ -738,7 +559,6 @@ def calculate_mean_firing_rate(
 
 ):
 
-
     spike_times = np.asarray(
 
         spike_times,
@@ -746,11 +566,6 @@ def calculate_mean_firing_rate(
         dtype=float,
 
     )
-
-
-    # --------------------------------------------------------
-    # ONLY POST-STIMULUS SPIKES
-    # --------------------------------------------------------
 
     analysis_spikes = spike_times[
 
@@ -760,11 +575,6 @@ def calculate_mean_firing_rate(
 
     ]
 
-
-    # --------------------------------------------------------
-    # POST-STIMULUS DURATION
-    # --------------------------------------------------------
-
     analysis_duration = (
 
         t_max
@@ -772,15 +582,6 @@ def calculate_mean_firing_rate(
         - stimulus_time
 
     )
-
-
-    # --------------------------------------------------------
-    # MEAN WHOLE-NETWORK FIRING RATE
-    #
-    #                  total post-stimulus spikes
-    # mean FR = ------------------------------------------
-    #             N × post-stimulus duration
-    # --------------------------------------------------------
 
     firing_rate = (
 
@@ -798,28 +599,13 @@ def calculate_mean_firing_rate(
 
     )
 
-
     return float(
         firing_rate
     )
 
-
-# ============================================================
-# EXPERIMENT III WORKER
-#
-# One worker runs:
-#
-#     one parameter pair
-#     one p
-#     one random realization
-#
-# Must remain outside main() for Windows multiprocessing.
-# ============================================================
-
 def run_experiment_3_realization(
     task,
 ):
-
 
     (
         pair_index,
@@ -829,11 +615,6 @@ def run_experiment_3_realization(
         realization,
 
     ) = task
-
-
-    # --------------------------------------------------------
-    # UNIQUE DETERMINISTIC SEED
-    # --------------------------------------------------------
 
     seed = (
 
@@ -855,19 +636,9 @@ def run_experiment_3_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # BUILD N = 250 RING
-    # --------------------------------------------------------
-
     local_network = build_ring_network(
         EXP3_N
     )
-
-
-    # --------------------------------------------------------
-    # ADD SHORTCUTS
-    # --------------------------------------------------------
 
     network, shortcuts = add_random_shortcuts(
 
@@ -882,13 +653,7 @@ def run_experiment_3_realization(
 
     )
 
-
-    # --------------------------------------------------------
-    # RUN SIMULATION
-    # --------------------------------------------------------
-
     start_time = time.perf_counter()
-
 
     spike_times, spike_neurons = run_simulation(
 
@@ -921,7 +686,6 @@ def run_experiment_3_realization(
 
     )
 
-
     runtime = (
 
         time.perf_counter()
@@ -929,11 +693,6 @@ def run_experiment_3_realization(
         - start_time
 
     )
-
-
-    # --------------------------------------------------------
-    # CALCULATE MEAN FIRING RATE
-    # --------------------------------------------------------
 
     firing_rate = calculate_mean_firing_rate(
 
@@ -950,11 +709,6 @@ def run_experiment_3_realization(
             EXP3_T_MAX,
 
     )
-
-
-    # --------------------------------------------------------
-    # RETURN RESULT
-    # --------------------------------------------------------
 
     return {
 
@@ -993,13 +747,7 @@ def run_experiment_3_realization(
 
     }
 
-
-# ============================================================
-# RUN EXPERIMENT III
-# ============================================================
-
 def run_experiment_3():
-
 
     print("\n")
 
@@ -1011,29 +759,24 @@ def run_experiment_3():
 
     print("=" * 90)
 
-
     print(
         "N =",
         EXP3_N,
     )
-
 
     print(
         "p values =",
         EXP3_P_VALUES,
     )
 
-
     print(
         "Realizations per p =",
         EXP3_NUM_REALIZATIONS,
     )
 
-
     print(
         "Parameter pairs ="
     )
-
 
     for pair_index, (
         I_ext,
@@ -1042,7 +785,6 @@ def run_experiment_3():
     ) in enumerate(
         EXP3_PARAMETER_PAIRS
     ):
-
 
         print(
 
@@ -1054,19 +796,12 @@ def run_experiment_3():
 
         )
 
-
     print(
         "CPU workers =",
         MAX_WORKERS,
     )
 
-
-    # ========================================================
-    # CREATE ALL TASKS
-    # ========================================================
-
     tasks = []
-
 
     for pair_index, (
 
@@ -1078,16 +813,13 @@ def run_experiment_3():
         EXP3_PARAMETER_PAIRS
     ):
 
-
         for p in EXP3_P_VALUES:
-
 
             for realization in range(
 
                 EXP3_NUM_REALIZATIONS
 
             ):
-
 
                 tasks.append(
 
@@ -1107,21 +839,14 @@ def run_experiment_3():
 
                 )
 
-
     print(
         "\nTotal simulations =",
         len(tasks),
     )
 
-
-    # ========================================================
-    # IMPORTANT
-    # ========================================================
-
     print(
         "\nThis is a large experiment:"
     )
-
 
     print(
 
@@ -1133,24 +858,15 @@ def run_experiment_3():
 
     )
 
-
     print(
         "=" * 90
     )
 
-
-    # ========================================================
-    # RUN IN PARALLEL
-    # ========================================================
-
     all_results = []
-
 
     completed = 0
 
-
     start_time = time.perf_counter()
-
 
     with ProcessPoolExecutor(
 
@@ -1159,9 +875,7 @@ def run_experiment_3():
 
     ) as executor:
 
-
         future_to_task = {
-
 
             executor.submit(
 
@@ -1173,11 +887,9 @@ def run_experiment_3():
 
             task
 
-
             for task in tasks
 
         }
-
 
         for future in as_completed(
 
@@ -1185,25 +897,19 @@ def run_experiment_3():
 
         ):
 
-
             task = future_to_task[
                 future
             ]
 
-
             try:
 
-
                 result = future.result()
-
 
                 all_results.append(
                     result
                 )
 
-
                 completed += 1
-
 
                 print(
 
@@ -1221,32 +927,22 @@ def run_experiment_3():
 
                 )
 
-
             except Exception as error:
-
 
                 print(
                     "\nERROR"
                 )
-
 
                 print(
                     "Task =",
                     task,
                 )
 
-
                 print(
                     error
                 )
 
-
     print()
-
-
-    # ========================================================
-    # SORT RESULTS
-    # ========================================================
 
     all_results.sort(
 
@@ -1264,11 +960,6 @@ def run_experiment_3():
 
     )
 
-
-    # ========================================================
-    # SAVE ALL REALIZATIONS
-    # ========================================================
-
     all_file = (
 
         RESULTS_DIR
@@ -1276,7 +967,6 @@ def run_experiment_3():
         / "experiment_3_all_realizations.csv"
 
     )
-
 
     with open(
 
@@ -1287,7 +977,6 @@ def run_experiment_3():
         newline="",
 
     ) as file:
-
 
         fieldnames = [
 
@@ -1315,7 +1004,6 @@ def run_experiment_3():
 
         ]
 
-
         writer = csv.DictWriter(
 
             file,
@@ -1325,21 +1013,13 @@ def run_experiment_3():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
             all_results
         )
 
-
-    # ========================================================
-    # BUILD SUMMARY
-    # ========================================================
-
     summary_results = []
-
 
     print("\n")
 
@@ -1351,7 +1031,6 @@ def run_experiment_3():
 
     print("=" * 90)
 
-
     for pair_index, (
 
         I_ext,
@@ -1362,9 +1041,7 @@ def run_experiment_3():
         EXP3_PARAMETER_PAIRS
     ):
 
-
         print("\n")
-
 
         print(
 
@@ -1374,17 +1051,13 @@ def run_experiment_3():
 
         )
 
-
         print(
             "-" * 70
         )
 
-
         for p in EXP3_P_VALUES:
 
-
             p = float(p)
-
 
             rows = [
 
@@ -1408,7 +1081,6 @@ def run_experiment_3():
 
             ]
 
-
             firing_rates = np.asarray(
 
                 [
@@ -1425,7 +1097,6 @@ def run_experiment_3():
 
             )
 
-
             mean_fr = float(
 
                 np.mean(
@@ -1433,7 +1104,6 @@ def run_experiment_3():
                 )
 
             )
-
 
             std_fr = float(
 
@@ -1448,7 +1118,6 @@ def run_experiment_3():
             ) if len(
                 firing_rates
             ) > 1 else 0.0
-
 
             summary_results.append({
 
@@ -1478,7 +1147,6 @@ def run_experiment_3():
 
             })
 
-
             print(
 
                 f"p = {p:4.2f}"
@@ -1491,11 +1159,6 @@ def run_experiment_3():
 
             )
 
-
-    # ========================================================
-    # SAVE SUMMARY
-    # ========================================================
-
     summary_file = (
 
         RESULTS_DIR
@@ -1503,7 +1166,6 @@ def run_experiment_3():
         / "experiment_3_summary.csv"
 
     )
-
 
     with open(
 
@@ -1514,7 +1176,6 @@ def run_experiment_3():
         newline="",
 
     ) as file:
-
 
         fieldnames = [
 
@@ -1536,7 +1197,6 @@ def run_experiment_3():
 
         ]
 
-
         writer = csv.DictWriter(
 
             file,
@@ -1546,23 +1206,15 @@ def run_experiment_3():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
             summary_results
         )
 
-
-    # ========================================================
-    # PLOT FIVE CONNECTED CURVES
-    # ========================================================
-
     plt.figure(
         figsize=(10, 7)
     )
-
 
     markers = [
 
@@ -1578,7 +1230,6 @@ def run_experiment_3():
 
     ]
 
-
     for pair_index, (
 
         I_ext,
@@ -1588,7 +1239,6 @@ def run_experiment_3():
     ) in enumerate(
         EXP3_PARAMETER_PAIRS
     ):
-
 
         rows = sorted(
 
@@ -1608,7 +1258,6 @@ def run_experiment_3():
 
         )
 
-
         p_values = np.asarray(
 
             [
@@ -1622,7 +1271,6 @@ def run_experiment_3():
             dtype=float,
 
         )
-
 
         mean_rates = np.asarray(
 
@@ -1640,7 +1288,6 @@ def run_experiment_3():
 
         )
 
-
         std_rates = np.asarray(
 
             [
@@ -1656,11 +1303,6 @@ def run_experiment_3():
             dtype=float,
 
         )
-
-
-        # ----------------------------------------------------
-        # CONNECTED CURVE
-        # ----------------------------------------------------
 
         plt.plot(
 
@@ -1687,11 +1329,6 @@ def run_experiment_3():
 
         )
 
-
-        # ----------------------------------------------------
-        # STANDARD DEVIATION REGION
-        # ----------------------------------------------------
-
         plt.fill_between(
 
             p_values,
@@ -1706,16 +1343,13 @@ def run_experiment_3():
 
         )
 
-
     plt.xlabel(
         "Shortcut density, p"
     )
 
-
     plt.ylabel(
         "Mean whole-network firing rate"
     )
-
 
     plt.title(
 
@@ -1725,23 +1359,18 @@ def run_experiment_3():
 
     )
 
-
     plt.xlim(
         0.0,
         1.0,
     )
 
-
     plt.legend()
-
 
     plt.grid(
         alpha=0.25
     )
 
-
     plt.tight_layout()
-
 
     figure_file = (
 
@@ -1750,7 +1379,6 @@ def run_experiment_3():
         / "experiment_3_firing_rate_vs_p.png"
 
     )
-
 
     plt.savefig(
 
@@ -1762,13 +1390,7 @@ def run_experiment_3():
 
     )
 
-
     plt.show()
-
-
-    # ========================================================
-    # FINISH
-    # ========================================================
 
     runtime = (
 
@@ -1777,7 +1399,6 @@ def run_experiment_3():
         - start_time
 
     )
-
 
     print("\n")
 
@@ -1789,52 +1410,38 @@ def run_experiment_3():
 
     print("=" * 90)
 
-
     print(
         "Runtime =",
         f"{runtime:.2f} seconds",
     )
 
-
     print(
         "All realizations:"
     )
-
 
     print(
         all_file
     )
 
-
     print(
         "Summary:"
     )
-
 
     print(
         summary_file
     )
 
-
     print(
         "Figure:"
     )
-
 
     print(
         figure_file
     )
 
-
-# ============================================================
-# MAIN
-# ============================================================
-
 def main():
 
-
     total_start = time.perf_counter()
-
 
     print("=" * 90)
 
@@ -1843,11 +1450,6 @@ def main():
     )
 
     print("=" * 90)
-
-
-    # ========================================================
-    # EXPERIMENT I
-    # ========================================================
 
     run_raster_firing_experiment(
 
@@ -1877,11 +1479,6 @@ def main():
 
     )
 
-
-    # ========================================================
-    # EXPERIMENT II
-    # ========================================================
-
     run_raster_firing_experiment(
 
         experiment_name=
@@ -1910,17 +1507,7 @@ def main():
 
     )
 
-
-    # ========================================================
-    # EXPERIMENT III
-    # ========================================================
-
     run_experiment_3()
-
-
-    # ========================================================
-    # EXPERIMENT IV
-    # ========================================================
 
     run_raster_firing_experiment(
 
@@ -1950,11 +1537,6 @@ def main():
 
     )
 
-
-    # ========================================================
-    # COMPLETE
-    # ========================================================
-
     total_runtime = (
 
         time.perf_counter()
@@ -1962,7 +1544,6 @@ def main():
         - total_start
 
     )
-
 
     print("\n")
 
@@ -1974,26 +1555,18 @@ def main():
 
     print("=" * 90)
 
-
     print(
         "Total runtime =",
         f"{total_runtime:.2f} seconds",
     )
 
-
     print(
         "Results directory:"
     )
 
-
     print(
         RESULTS_DIR
     )
-
-
-# ============================================================
-# WINDOWS MULTIPROCESSING PROTECTION
-# ============================================================
 
 if __name__ == "__main__":
 
