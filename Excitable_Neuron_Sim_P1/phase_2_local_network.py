@@ -19,11 +19,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================
-# PATH SETUP
-# ============================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 FIGURE_DIR = PROJECT_DIR / "figures"
 
@@ -34,13 +29,6 @@ FIGURE_DIR.mkdir(
 
 print("Project directory:", PROJECT_DIR)
 print("Figure directory:", FIGURE_DIR)
-
-
-
-
-# --------------------------------------------
-# Parameters
-# --------------------------------------------
 
 N = 100
 
@@ -55,19 +43,9 @@ T_MAX = 70.0
 STIMULUS_NEURON = N // 2
 STIMULUS_TIME = 10.0
 
-
-# --------------------------------------------
-# Build p = 0 local ring
-# --------------------------------------------
-
 network = build_ring_network(N)
 
 validate_ring_network(network)
-
-
-# --------------------------------------------
-# Run simulation
-# --------------------------------------------
 
 spike_times, spike_neurons = run_simulation(
     outgoing_connections=network,
@@ -80,11 +58,6 @@ spike_times, spike_neurons = run_simulation(
     stimulus_neuron=STIMULUS_NEURON,
     stimulus_time=STIMULUS_TIME,
 )
-
-
-# --------------------------------------------
-# Print basic results
-# --------------------------------------------
 
 print("\nPHASE 2 RESULTS")
 print("-" * 40)
@@ -100,11 +73,6 @@ print(
     "Last spike time:",
     spike_times[-1] if len(spike_times) else None
 )
-
-
-# ============================================
-# RASTER PLOT — DEBUG VERSION
-# ============================================
 
 print("DEBUG 1: Starting plot")
 
