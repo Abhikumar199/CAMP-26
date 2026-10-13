@@ -1,46 +1,4 @@
-"""
-phase_9_dynamic_shortcut_activation.py
 
-PHASE 9
--------
-
-Question:
-
-    Are return-oriented shortcuts actually used dynamically
-    during successful propagation?
-
-For every shortcut:
-
-    source -> target
-
-we measure:
-
-    1. Does the source neuron fire?
-    2. Does the target fire shortly after the source?
-    3. How many putative activation events occur?
-    4. Are return-oriented shortcuts used more often?
-    5. Does dynamic shortcut use differ between
-       SUCCESS and FAILURE networks?
-
-IMPORTANT:
-
-    A "putative activation" means:
-
-        source spike at t_source
-
-        followed by
-
-        target spike within:
-
-            MIN_DELAY <=
-            t_target - t_source
-            <= MAX_DELAY
-
-    This is temporal evidence of shortcut use.
-
-    It is NOT yet strict causal proof because the target
-    can also receive local ring inputs.
-"""
 
 from pathlib import Path
 import csv

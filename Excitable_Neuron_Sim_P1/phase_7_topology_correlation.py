@@ -1,41 +1,4 @@
-"""
-phase_7_topology_correlation.py
 
-PHASE 7
--------
-
-Question:
-
-    At the SAME p and SAME neuron parameters,
-    why do some network realizations SUCCEED
-    while others FAIL?
-
-Method:
-
-    Phase 6 results
-            ↓
-    Select mixed p closest to P_success = 0.5
-            ↓
-    Reconstruct exact networks using same p and seed
-            ↓
-    Extract topology features
-            ↓
-    Compare SUCCESS vs FAILURE
-            ↓
-    Correlate topology with propagation outcome
-
-IMPORTANT:
-
-    Phase 7 does NOT rerun neural simulations.
-
-    It uses:
-
-        results/phase6/
-        phase6_all_realizations.csv
-
-        results/phase6/
-        phase6_probability_curve.csv
-"""
 
 from pathlib import Path
 import csv

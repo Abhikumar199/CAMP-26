@@ -1,36 +1,4 @@
-"""
-phase_11_N2000_time_horizon_control.py
 
-PHASE 11
---------
-
-Goal:
-
-    Determine the correct simulation time horizon for N = 2000.
-
-Problem discovered in Phase 10:
-
-    At T_MAX = 200, every N = 2000 realization
-    was classified as SUCCESS.
-
-Possible explanation:
-
-    The initial propagating wave may simply still be travelling
-    through the large ring when the simulation ends.
-
-Therefore, before estimating P_failure(p), we must determine:
-
-    1. How long does activity last in a pure ring (p = 0)?
-    2. How does lifetime change with 1, 2, and 4 shortcuts?
-    3. Is activity still present near T_MAX = 3000?
-
-IMPORTANT:
-
-    This is a time-horizon control experiment.
-
-    Do NOT interpret "reaches T_MAX" as final proof
-    of persistent activity yet.
-"""
 
 from pathlib import Path
 

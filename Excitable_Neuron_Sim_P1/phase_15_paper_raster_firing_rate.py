@@ -1,25 +1,4 @@
-"""
-phase_15_paper_raster_firing_rate.py
 
-Replicate Fig. 1 of the paper qualitatively.
-
-TOP:
-    Raster plot of ALL neurons
-    x-axis = time
-    y-axis = neuron index
-
-BOTTOM:
-    Normalized instantaneous firing rate
-    of the WHOLE NETWORK
-
-Parameters follow the paper figure:
-    N = 1000
-    I_ext = 0.85
-    g_syn = 0.2
-    tau_m = 10
-    tau_D = 1
-    p = 0.1
-"""
 
 from pathlib import Path
 

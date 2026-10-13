@@ -1,33 +1,4 @@
-"""
-phase_10_benchmark_N2000.py
 
-PHASE 10
---------
-
-Goal:
-
-    Test whether the current simulator can handle
-    the paper-scale network:
-
-        N = 2000
-
-Before running a large probability sweep, benchmark:
-
-    - runtime
-    - number of spikes
-    - last spike time
-    - SUCCESS / FAILURE
-    - shortcut count
-
-This phase does NOT estimate the final probability curve.
-
-It answers:
-
-    1. Does N = 2000 run correctly?
-    2. How long does one realization take?
-    3. Which p values show interesting behavior?
-    4. Is a larger Phase 11 sweep computationally practical?
-"""
 
 from pathlib import Path
 import csv

@@ -1,23 +1,4 @@
-"""
-phase_4_persistent_activity.py
 
-PHASE 4
--------
-
-Design an algorithm to classify one simulation as:
-
-    SUCCESS  -> activity is still present near T_MAX
-    FAILURE  -> activity dies before T_MAX
-
-Also measure:
-
-    - failure time
-    - persistence duration after the initial stimulus
-    - total spikes
-    - last spike time
-
-This directly implements project task (e).
-"""
 
 from pathlib import Path
 

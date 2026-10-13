@@ -1,32 +1,4 @@
-"""
-phase_3_small_world_network.py
 
-PHASE 3
--------
-
-Study how different random shortcut realizations
-produce different dynamical outcomes.
-
-For fixed:
-    N
-    p
-    neuron parameters
-    initial stimulus
-
-we vary only:
-    random seed -> shortcut topology
-
-Outputs:
-    1. Terminal summary
-    2. CSV of realization-level results
-    3. CSV of shortcut-level data
-    4. Persistence-duration plot
-    5. Total-spikes plot
-
-Scientific question:
-    Why do some network realizations sustain activity
-    while others fail?
-"""
 
 from pathlib import Path
 import csv

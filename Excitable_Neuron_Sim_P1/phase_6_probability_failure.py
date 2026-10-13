@@ -1,23 +1,3 @@
-"""
-phase_6_probability_failure.py
-
-PHASE 6
--------
-
-Estimate:
-
-    P_failure(p)
-    P_success(p)
-
-for different shortcut probabilities p.
-
-For every p:
-    1. Generate multiple network realizations.
-    2. Run the simulation.
-    3. Classify each realization using the Phase 5 rule.
-    4. Calculate failure and success probabilities.
-    5. Save results and plot the probability curves.
-"""
 
 from pathlib import Path
 import csv
