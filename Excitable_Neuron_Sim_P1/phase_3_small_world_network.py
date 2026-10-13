@@ -45,11 +45,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================================
-# PATH SETUP
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 
 RESULTS_DIR = PROJECT_DIR / "results" / "phase3"
@@ -65,20 +60,10 @@ FIGURES_DIR.mkdir(
     exist_ok=True,
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 100
 P = 0.1
 
 N_REALIZATIONS = 20
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 G_SYN = 0.20
@@ -86,34 +71,13 @@ G_SYN = 0.20
 TAU_M = 10.0
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 T_MAX = 200.0
 
 STIMULUS_NEURON = N // 2
 STIMULUS_TIME = 10.0
 
-
-# ============================================================
-# TEMPORARY PERSISTENCE RULE
-# ============================================================
-
-# If activity reaches this final time window,
-# temporarily classify it as persistent.
-#
-# A more rigorous classifier will be Phase 5.
-
 FINAL_WINDOW = 5.0
-
-
-# ============================================================
-# HELPER FUNCTION:
-# CIRCULAR SHORTCUT LENGTH
-# ============================================================
 
 def circular_distance(source, target, N):
     """
@@ -136,11 +100,6 @@ def circular_distance(source, target, N):
         direct_distance,
         wrapped_distance,
     )
-
-
-# ============================================================
-# HEADER
-# ============================================================
 
 print("=" * 70)
 print("PHASE 3: SMALL-WORLD REALIZATION STUDY")
@@ -181,11 +140,6 @@ print(
     STIMULUS_TIME,
 )
 
-
-# ============================================================
-# VALIDATE ONE NETWORK BEFORE THE FULL EXPERIMENT
-# ============================================================
-
 print("\n")
 print("=" * 70)
 print("NETWORK CONSTRUCTION VALIDATION")
@@ -193,17 +147,11 @@ print("=" * 70)
 
 validation_seed = 42
 
-
-# Build ring
-
 validation_ring = build_ring_network(N)
 
 validate_ring_network(
     validation_ring
 )
-
-
-# Add shortcuts
 
 validation_network, validation_shortcuts = (
     add_random_shortcuts(
@@ -213,18 +161,12 @@ validation_network, validation_shortcuts = (
     )
 )
 
-
-# Validate
-
 validate_small_world_network(
     local_network=validation_ring,
     small_world_network=validation_network,
     shortcuts=validation_shortcuts,
     p=P,
 )
-
-
-# Print example shortcuts
 
 print("\nEXAMPLE SHORTCUTS FOR SEED 42")
 print("-" * 50)
@@ -242,38 +184,18 @@ for source, target in validation_shortcuts:
         f"    ring distance = {distance}"
     )
 
-
-# ============================================================
-# STORAGE
-# ============================================================
-
 realization_results = []
 
 shortcut_results = []
-
-
-# ============================================================
-# RUN MULTIPLE RANDOM REALIZATIONS
-# ============================================================
 
 print("\n")
 print("=" * 70)
 print("RUNNING RANDOM NETWORK REALIZATIONS")
 print("=" * 70)
 
-
 for seed in range(N_REALIZATIONS):
 
-    # --------------------------------------------------------
-    # 1. Build fresh local ring
-    # --------------------------------------------------------
-
     local_network = build_ring_network(N)
-
-
-    # --------------------------------------------------------
-    # 2. Add new random shortcuts
-    # --------------------------------------------------------
 
     small_world_network, shortcuts = (
         add_random_shortcuts(
@@ -282,11 +204,6 @@ for seed in range(N_REALIZATIONS):
             seed=seed,
         )
     )
-
-
-    # --------------------------------------------------------
-    # 3. Calculate shortcut statistics
-    # --------------------------------------------------------
 
     shortcut_lengths = []
 
@@ -307,7 +224,6 @@ for seed in range(N_REALIZATIONS):
             "ring_distance": length,
         })
 
-
     mean_shortcut_length = (
         sum(shortcut_lengths)
         / len(shortcut_lengths)
@@ -316,11 +232,6 @@ for seed in range(N_REALIZATIONS):
     max_shortcut_length = max(
         shortcut_lengths
     )
-
-
-    # --------------------------------------------------------
-    # 4. Run neuronal dynamics
-    # --------------------------------------------------------
 
     spike_times, spike_neurons = run_simulation(
         outgoing_connections=small_world_network,
@@ -334,13 +245,7 @@ for seed in range(N_REALIZATIONS):
         stimulus_time=STIMULUS_TIME,
     )
 
-
-    # --------------------------------------------------------
-    # 5. Extract dynamical results
-    # --------------------------------------------------------
-
     total_spikes = len(spike_times)
-
 
     if total_spikes > 0:
 
@@ -357,16 +262,10 @@ for seed in range(N_REALIZATIONS):
         first_spike_time = 0.0
         last_spike_time = 0.0
 
-
-    # --------------------------------------------------------
-    # 6. Temporary persistence classification
-    # --------------------------------------------------------
-
     persisted = (
         last_spike_time
         >= T_MAX - FINAL_WINDOW
     )
-
 
     if persisted:
 
@@ -375,11 +274,6 @@ for seed in range(N_REALIZATIONS):
     else:
 
         status = "FAILED"
-
-
-    # --------------------------------------------------------
-    # 7. Store realization result
-    # --------------------------------------------------------
 
     realization_results.append({
 
@@ -409,11 +303,6 @@ for seed in range(N_REALIZATIONS):
         "status": status,
     })
 
-
-    # --------------------------------------------------------
-    # 8. Print result
-    # --------------------------------------------------------
-
     print(
 
         f"Seed {seed:3d} | "
@@ -427,11 +316,6 @@ for seed in range(N_REALIZATIONS):
         f"{status}"
     )
 
-
-# ============================================================
-# SUMMARY STATISTICS
-# ============================================================
-
 persistent_results = [
 
     result
@@ -440,7 +324,6 @@ persistent_results = [
 
     if result["status"] == "PERSISTENT"
 ]
-
 
 failed_results = [
 
@@ -451,7 +334,6 @@ failed_results = [
     if result["status"] == "FAILED"
 ]
 
-
 n_persistent = len(
     persistent_results
 )
@@ -460,22 +342,15 @@ n_failed = len(
     failed_results
 )
 
-
 probability_persistent = (
     n_persistent
     / N_REALIZATIONS
 )
 
-
 probability_failure = (
     n_failed
     / N_REALIZATIONS
 )
-
-
-# ============================================================
-# PRINT SUMMARY
-# ============================================================
 
 print("\n")
 print("=" * 70)
@@ -507,14 +382,8 @@ print(
     round(probability_failure, 3)
 )
 
-
-# ============================================================
-# PRINT INTERESTING SEEDS
-# ============================================================
-
 print("\nINTERESTING SEEDS")
 print("-" * 50)
-
 
 if persistent_results:
 
@@ -532,7 +401,6 @@ else:
     print(
         "No persistent seed found."
     )
-
 
 if failed_results:
 
@@ -560,16 +428,10 @@ if failed_results:
         longest_failure["last_spike_time"],
     )
 
-
-# ============================================================
-# SAVE REALIZATION-LEVEL CSV
-# ============================================================
-
 realization_file = (
     RESULTS_DIR
     / "phase3_realization_results.csv"
 )
-
 
 fieldnames = [
 
@@ -596,7 +458,6 @@ fieldnames = [
     "status",
 ]
 
-
 with open(
     realization_file,
     "w",
@@ -614,21 +475,14 @@ with open(
         realization_results
     )
 
-
 print("\nRealization results saved to:")
 
 print(realization_file)
-
-
-# ============================================================
-# SAVE SHORTCUT-LEVEL CSV
-# ============================================================
 
 shortcut_file = (
     RESULTS_DIR
     / "phase3_shortcuts.csv"
 )
-
 
 with open(
     shortcut_file,
@@ -652,16 +506,9 @@ with open(
         shortcut_results
     )
 
-
 print("\nShortcut data saved to:")
 
 print(shortcut_file)
-
-
-# ============================================================
-# FIGURE 1:
-# PERSISTENCE DURATION BY SEED
-# ============================================================
 
 seeds = [
 
@@ -670,7 +517,6 @@ seeds = [
     for result in realization_results
 ]
 
-
 durations = [
 
     result["persistence_duration"]
@@ -678,24 +524,20 @@ durations = [
     for result in realization_results
 ]
 
-
 plt.figure(
     figsize=(12, 6)
 )
-
 
 plt.bar(
     seeds,
     durations,
 )
 
-
 plt.axhline(
     T_MAX - STIMULUS_TIME,
     linestyle="--",
     label="Simulation limit",
 )
-
 
 plt.xlabel(
     "Random network seed"
@@ -712,12 +554,10 @@ plt.title(
 
 plt.legend()
 
-
 duration_figure = (
     FIGURES_DIR
     / "phase3_duration_by_seed.png"
 )
-
 
 plt.savefig(
     duration_figure,
@@ -726,16 +566,9 @@ plt.savefig(
 
 plt.close()
 
-
 print("\nDuration figure saved to:")
 
 print(duration_figure)
-
-
-# ============================================================
-# FIGURE 2:
-# TOTAL SPIKES BY SEED
-# ============================================================
 
 total_spike_values = [
 
@@ -744,17 +577,14 @@ total_spike_values = [
     for result in realization_results
 ]
 
-
 plt.figure(
     figsize=(12, 6)
 )
-
 
 plt.bar(
     seeds,
     total_spike_values,
 )
-
 
 plt.xlabel(
     "Random network seed"
@@ -769,12 +599,10 @@ plt.title(
     "Across Random Realizations"
 )
 
-
 spike_figure = (
     FIGURES_DIR
     / "phase3_total_spikes_by_seed.png"
 )
-
 
 plt.savefig(
     spike_figure,
@@ -783,16 +611,9 @@ plt.savefig(
 
 plt.close()
 
-
 print("\nSpike-count figure saved to:")
 
 print(spike_figure)
-
-
-# ============================================================
-# FIGURE 3:
-# SHORTCUT LENGTH VS ACTIVITY DURATION
-# ============================================================
 
 mean_lengths = [
 
@@ -801,18 +622,15 @@ mean_lengths = [
     for result in realization_results
 ]
 
-
 plt.figure(
     figsize=(8, 6)
 )
-
 
 plt.scatter(
     mean_lengths,
     durations,
     s=60,
 )
-
 
 plt.xlabel(
     "Mean shortcut length"
@@ -826,12 +644,10 @@ plt.title(
     "Phase 3: Shortcut Length vs Activity Duration"
 )
 
-
 relationship_figure = (
     FIGURES_DIR
     / "phase3_shortcut_length_vs_duration.png"
 )
-
 
 plt.savefig(
     relationship_figure,
@@ -840,15 +656,9 @@ plt.savefig(
 
 plt.close()
 
-
 print("\nRelationship figure saved to:")
 
 print(relationship_figure)
-
-
-# ============================================================
-# FINAL MESSAGE
-# ============================================================
 
 print("\n")
 print("=" * 70)
