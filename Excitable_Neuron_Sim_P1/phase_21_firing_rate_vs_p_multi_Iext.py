@@ -20,8 +20,6 @@ from network import (
 
 from simulator import run_simulation
 
-
-
 PROJECT_DIR = Path(__file__).resolve().parent
 
 RESULTS_DIR = (
@@ -35,31 +33,24 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 )
 
-
 ALL_FILE = (
     RESULTS_DIR
     / "all_realizations.csv"
 )
-
 
 SUMMARY_FILE = (
     RESULTS_DIR
     / "firing_rate_vs_p_summary.csv"
 )
 
-
 FIGURE_FILE = (
     RESULTS_DIR
     / "firing_rate_vs_p_multi_Iext.png"
 )
 
-
-
-
 N = 250
 
 G_SYN = 0.4
-
 
 I_EXT_VALUES = [
 
@@ -75,9 +66,6 @@ I_EXT_VALUES = [
 
 ]
 
-
-
-
 P_VALUES = np.arange(
 
     0.0,
@@ -88,12 +76,7 @@ P_VALUES = np.arange(
 
 )
 
-
-
-
 NUM_REALIZATIONS = 3
-
-
 
 TAU_M = 10.0
 
@@ -107,8 +90,6 @@ STIMULUS_TIME = 10.0
 
 STIMULUS_NEURON = N // 2
 
-
-
 CPU_COUNT = os.cpu_count() or 4
 
 MAX_WORKERS = max(
@@ -119,13 +100,9 @@ MAX_WORKERS = max(
 
 )
 
-
-
-
 def calculate_mean_firing_rate(
     spike_times,
 ):
-
 
     spike_times = np.asarray(
 
@@ -135,9 +112,6 @@ def calculate_mean_firing_rate(
 
     )
 
-
-
-
     post_stimulus_spikes = spike_times[
 
         spike_times
@@ -146,8 +120,6 @@ def calculate_mean_firing_rate(
 
     ]
 
-
-
     observation_duration = (
 
         T_MAX
@@ -155,8 +127,6 @@ def calculate_mean_firing_rate(
         - STIMULUS_TIME
 
     )
-
-
 
     firing_rate = (
 
@@ -175,18 +145,13 @@ def calculate_mean_firing_rate(
 
     )
 
-
     return float(
         firing_rate
     )
 
-
-
-
 def run_one_realization(
     task,
 ):
-
 
     (
         current_index,
@@ -195,9 +160,6 @@ def run_one_realization(
         realization,
 
     ) = task
-
-
-
 
     seed = (
 
@@ -219,13 +181,9 @@ def run_one_realization(
 
     )
 
-
-
     local_network = build_ring_network(
         N
     )
-
-
 
     network, shortcuts = add_random_shortcuts(
 
@@ -240,11 +198,7 @@ def run_one_realization(
 
     )
 
-
-
-
     start_time = time.perf_counter()
-
 
     spike_times, spike_neurons = run_simulation(
 
@@ -277,7 +231,6 @@ def run_one_realization(
 
     )
 
-
     runtime = (
 
         time.perf_counter()
@@ -286,16 +239,11 @@ def run_one_realization(
 
     )
 
-
-
     firing_rate = calculate_mean_firing_rate(
 
         spike_times
 
     )
-
-
-
 
     return {
 
@@ -334,11 +282,7 @@ def run_one_realization(
 
     }
 
-
-
-
 def main():
-
 
     print("=" * 90)
 
@@ -348,53 +292,42 @@ def main():
 
     print("=" * 90)
 
-
     print(
         "\nN =",
         N,
     )
-
 
     print(
         "g_syn =",
         G_SYN,
     )
 
-
     print(
         "Stimulus time =",
         STIMULUS_TIME,
     )
-
 
     print(
         "I_ext values =",
         I_EXT_VALUES,
     )
 
-
     print(
         "p values =",
         P_VALUES,
     )
-
 
     print(
         "Realizations per condition =",
         NUM_REALIZATIONS,
     )
 
-
     print(
         "CPU workers =",
         MAX_WORKERS,
     )
 
-
-
-
     tasks = []
-
 
     for current_index, I_ext in enumerate(
 
@@ -402,16 +335,13 @@ def main():
 
     ):
 
-
         for p in P_VALUES:
-
 
             for realization in range(
 
                 NUM_REALIZATIONS
 
             ):
-
 
                 tasks.append(
 
@@ -429,14 +359,10 @@ def main():
 
                 )
 
-
     print(
         "\nTotal simulations =",
         len(tasks),
     )
-
-
-
 
     all_results = []
 
@@ -444,11 +370,9 @@ def main():
 
     total_start = time.perf_counter()
 
-
     print("\nRUNNING SIMULATIONS")
 
     print("-" * 90)
-
 
     with ProcessPoolExecutor(
 
@@ -457,9 +381,7 @@ def main():
 
     ) as executor:
 
-
         future_to_task = {
-
 
             executor.submit(
 
@@ -471,11 +393,9 @@ def main():
 
             task
 
-
             for task in tasks
 
         }
-
 
         for future in as_completed(
 
@@ -483,25 +403,19 @@ def main():
 
         ):
 
-
             task = future_to_task[
                 future
             ]
 
-
             try:
 
-
                 result = future.result()
-
 
                 all_results.append(
                     result
                 )
 
-
                 completed += 1
-
 
                 print(
 
@@ -531,25 +445,20 @@ def main():
 
                 )
 
-
             except Exception as error:
-
 
                 print(
                     "\nERROR:"
                 )
-
 
                 print(
                     "Task =",
                     task,
                 )
 
-
                 print(
                     error
                 )
-
 
     all_results.sort(
 
@@ -567,8 +476,6 @@ def main():
 
     )
 
-
-
     with open(
 
         ALL_FILE,
@@ -578,7 +485,6 @@ def main():
         newline="",
 
     ) as file:
-
 
         fieldnames = [
 
@@ -606,7 +512,6 @@ def main():
 
         ]
 
-
         writer = csv.DictWriter(
 
             file,
@@ -616,17 +521,13 @@ def main():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
             all_results
         )
 
-
     summary_results = []
-
 
     print("\n")
 
@@ -638,16 +539,13 @@ def main():
 
     print("=" * 90)
 
-
     for current_index, I_ext in enumerate(
 
         I_EXT_VALUES
 
     ):
 
-
         print("\n")
-
 
         print(
 
@@ -655,17 +553,13 @@ def main():
 
         )
 
-
         print(
             "-" * 70
         )
 
-
         for p in P_VALUES:
 
-
             p = float(p)
-
 
             rows = [
 
@@ -692,7 +586,6 @@ def main():
 
             ]
 
-
             firing_rates = np.asarray(
 
                 [
@@ -709,7 +602,6 @@ def main():
 
             )
 
-
             mean_fr = float(
 
                 np.mean(
@@ -717,7 +609,6 @@ def main():
                 )
 
             )
-
 
             std_fr = float(
 
@@ -732,7 +623,6 @@ def main():
             ) if len(
                 firing_rates
             ) > 1 else 0.0
-
 
             summary_results.append({
 
@@ -762,7 +652,6 @@ def main():
 
             })
 
-
             print(
 
                 f"p = {p:.1f}"
@@ -777,9 +666,6 @@ def main():
 
             )
 
-
-
-
     with open(
 
         SUMMARY_FILE,
@@ -789,7 +675,6 @@ def main():
         newline="",
 
     ) as file:
-
 
         fieldnames = [
 
@@ -811,7 +696,6 @@ def main():
 
         ]
 
-
         writer = csv.DictWriter(
 
             file,
@@ -821,21 +705,15 @@ def main():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
             summary_results
         )
 
-
-
-
     plt.figure(
         figsize=(10, 7)
     )
-
 
     markers = [
 
@@ -851,13 +729,11 @@ def main():
 
     ]
 
-
     for current_index, I_ext in enumerate(
 
         I_EXT_VALUES
 
     ):
-
 
         rows = sorted(
 
@@ -877,7 +753,6 @@ def main():
 
         )
 
-
         p_plot = np.asarray(
 
             [
@@ -891,7 +766,6 @@ def main():
             dtype=float,
 
         )
-
 
         mean_fr_plot = np.asarray(
 
@@ -909,7 +783,6 @@ def main():
 
         )
 
-
         std_fr_plot = np.asarray(
 
             [
@@ -925,9 +798,6 @@ def main():
             dtype=float,
 
         )
-
-
-
 
         plt.plot(
 
@@ -954,9 +824,6 @@ def main():
 
         )
 
-
-
-
         plt.fill_between(
 
             p_plot,
@@ -971,18 +838,13 @@ def main():
 
         )
 
-
-
-
     plt.xlabel(
         "Shortcut density, p"
     )
 
-
     plt.ylabel(
         "Mean whole-network firing rate"
     )
-
 
     plt.title(
 
@@ -996,31 +858,24 @@ def main():
 
     )
 
-
     plt.xlim(
         0.0,
         1.0,
     )
 
-
     plt.xticks(
         P_VALUES
     )
-
 
     plt.legend(
         title="External current"
     )
 
-
     plt.grid(
         alpha=0.25
     )
 
-
     plt.tight_layout()
-
-
 
     plt.savefig(
 
@@ -1032,10 +887,7 @@ def main():
 
     )
 
-
     plt.show()
-
-
 
     total_runtime = (
 
@@ -1044,7 +896,6 @@ def main():
         - total_start
 
     )
-
 
     print("\n")
 
@@ -1056,50 +907,39 @@ def main():
 
     print("=" * 90)
 
-
     print(
         "Total simulations =",
         len(all_results),
     )
-
 
     print(
         "Total runtime =",
         f"{total_runtime:.2f} seconds",
     )
 
-
     print(
         "\nAll realizations:"
     )
-
 
     print(
         ALL_FILE
     )
 
-
     print(
         "\nSummary:"
     )
-
 
     print(
         SUMMARY_FILE
     )
 
-
     print(
         "\nFigure:"
     )
 
-
     print(
         FIGURE_FILE
     )
-
-
-
 
 if __name__ == "__main__":
 
