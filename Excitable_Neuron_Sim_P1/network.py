@@ -8,7 +8,6 @@ Phase 2:
     No long-range shortcuts yet.
 """
 
-
 def build_ring_network(N):
     """
     Build a one-dimensional ring of N neurons.
@@ -53,7 +52,6 @@ def build_ring_network(N):
 
     return outgoing_connections
 
-
 def print_network(outgoing_connections):
     """
     Print the outgoing connections of every neuron.
@@ -69,7 +67,6 @@ def print_network(outgoing_connections):
         print(
             f"Neuron {neuron} -> {targets}"
         )
-
 
 def validate_ring_network(outgoing_connections):
     """
@@ -119,10 +116,8 @@ def validate_ring_network(outgoing_connections):
         "Every neuron has 2 outgoing local connections."
     )
 
-
 if __name__ == "__main__":
 
-    # Small network only for testing
     N = 10
 
     network = build_ring_network(N)
@@ -131,12 +126,7 @@ if __name__ == "__main__":
 
     validate_ring_network(network)
 
-
-
-# Phase 3
-
 import numpy as np
-
 
 def add_random_shortcuts(
     outgoing_connections,
@@ -176,7 +166,6 @@ def add_random_shortcuts(
 
     rng = np.random.default_rng(seed)
 
-    # Copy the original ring
     small_world_network = [
         list(targets)
         for targets in outgoing_connections
@@ -191,11 +180,9 @@ def add_random_shortcuts(
         source = int(rng.integers(0, N))
         target = int(rng.integers(0, N))
 
-        # No self-connections
         if source == target:
             continue
 
-        # Do not duplicate any existing edge
         if target in small_world_network[source]:
             continue
 
@@ -221,10 +208,8 @@ def validate_small_world_network(
 
     expected_shortcuts = int(round(p * N))
 
-    # Check shortcut number
     assert len(shortcuts) == expected_shortcuts
 
-    # Check all local edges still exist
     for source in range(N):
 
         for target in local_network[source]:
@@ -234,12 +219,10 @@ def validate_small_world_network(
                 in small_world_network[source]
             )
 
-    # Check no self-connections
     for source, target in shortcuts:
 
         assert source != target
 
-    # Check no duplicate shortcuts
     assert len(shortcuts) == len(set(shortcuts))
 
     local_edges = sum(
