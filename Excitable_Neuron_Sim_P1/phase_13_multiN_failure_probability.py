@@ -10,11 +10,6 @@ import matplotlib.pyplot as plt
 from network import build_ring_network, add_random_shortcuts
 from simulator import run_simulation
 
-
-# ============================================================
-# PATHS
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = PROJECT_DIR / "results" / "phase13_multiN"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -23,11 +18,6 @@ ALL_FILE = RESULTS_DIR / "all_realizations.csv"
 CURVE_FILE = RESULTS_DIR / "multiN_probability_curves.csv"
 PCR_FILE = RESULTS_DIR / "critical_points.csv"
 FIGURE_FILE = RESULTS_DIR / "paper_style_multiN_inset.png"
-
-
-# ============================================================
-# EXPERIMENT PARAMETERS
-# ============================================================
 
 N_VALUES = [250, 500, 1000, 2000]
 
@@ -46,21 +36,9 @@ FINAL_WINDOW_END = 3000.0
 
 NUM_REALIZATIONS = 100
 
-
-# ============================================================
-# CPU SETTINGS
-# ============================================================
-
 CPU_COUNT = os.cpu_count() or 4
 
-# Use almost all logical CPU cores.
-# Leave one core free so Windows remains responsive.
 MAX_WORKERS = max(1, CPU_COUNT - 1)
-
-
-# ============================================================
-# P VALUES
-# ============================================================
 
 P_VALUES = np.array([
     0.00,
@@ -79,11 +57,6 @@ P_VALUES = np.array([
     0.35,
     0.40,
 ])
-
-
-# ============================================================
-# CLASSIFY ONE REALIZATION
-# ============================================================
 
 def classify_realization(spike_times):
 
@@ -121,44 +94,19 @@ def classify_realization(spike_times):
         late_spikes,
     )
 
-
-# ============================================================
-# WORKER FUNCTION
-#
-# Each CPU process runs ONE independent realization.
-#
-# IMPORTANT:
-# This function must stay outside main().
-# Windows multiprocessing needs top-level functions.
-# ============================================================
-
 def run_one_realization(task):
 
     N, p, seed = task
 
-    # Build local ring network inside worker process.
-    #
-    # This avoids sharing mutable network objects
-    # between CPU processes.
     local_network = build_ring_network(N)
 
     stimulus_neuron = N // 2
-
-
-    # --------------------------------------------------------
-    # Add random shortcuts
-    # --------------------------------------------------------
 
     network, shortcuts = add_random_shortcuts(
         outgoing_connections=local_network,
         p=p,
         seed=seed,
     )
-
-
-    # --------------------------------------------------------
-    # Run simulation
-    # --------------------------------------------------------
 
     run_start = time.perf_counter()
 
@@ -176,22 +124,12 @@ def run_one_realization(task):
 
     runtime = time.perf_counter() - run_start
 
-
-    # --------------------------------------------------------
-    # Classify result
-    # --------------------------------------------------------
-
     (
         status,
         total_spikes,
         last_spike,
         late_spikes,
     ) = classify_realization(spike_times)
-
-
-    # --------------------------------------------------------
-    # Return result to main process
-    # --------------------------------------------------------
 
     return {
         "N": N,
@@ -205,15 +143,7 @@ def run_one_realization(task):
         "runtime_seconds": runtime,
     }
 
-
-# ============================================================
-# ESTIMATE CRITICAL p
-# ============================================================
-
 def estimate_p_cr(rows):
-
-    # Exclude p=0 because the pure-ring case
-    # is treated separately.
 
     rows = sorted(
         [
@@ -223,9 +153,6 @@ def estimate_p_cr(rows):
         ],
         key=lambda r: r["p"],
     )
-
-
-    # Search for crossing of probability = 0.5
 
     for a, b in zip(
         rows[:-1],
@@ -254,10 +181,6 @@ def estimate_p_cr(rows):
                 (y2 - y1)
             )
 
-
-    # Fallback:
-    # choose point closest to 50% failure.
-
     return min(
         rows,
         key=lambda r:
@@ -267,20 +190,11 @@ def estimate_p_cr(rows):
             ),
     )["p"]
 
-
-# ============================================================
-# SAVE CSV FILES
-# ============================================================
-
 def save_results(
     all_rows,
     curve_rows,
     critical_rows,
 ):
-
-    # --------------------------------------------------------
-    # All individual realizations
-    # --------------------------------------------------------
 
     with open(
         ALL_FILE,
@@ -298,11 +212,6 @@ def save_results(
         writer.writeheader()
         writer.writerows(all_rows)
 
-
-    # --------------------------------------------------------
-    # Probability curves
-    # --------------------------------------------------------
-
     with open(
         CURVE_FILE,
         "w",
@@ -318,11 +227,6 @@ def save_results(
 
         writer.writeheader()
         writer.writerows(curve_rows)
-
-
-    # --------------------------------------------------------
-    # Critical points
-    # --------------------------------------------------------
 
     with open(
         PCR_FILE,
@@ -343,11 +247,6 @@ def save_results(
             critical_rows
         )
 
-
-# ============================================================
-# PLOT PAPER-STYLE MULTI-N CURVES
-# ============================================================
-
 def make_plot(curve_rows):
 
     plt.figure(
@@ -361,10 +260,7 @@ def make_plot(curve_rows):
         2000: "o",
     }
 
-
     for N in N_VALUES:
-
-        # Exclude p=0 from connected curve.
 
         rows = sorted(
             [
@@ -379,7 +275,6 @@ def make_plot(curve_rows):
             key=lambda r: r["p"],
         )
 
-
         x = np.array([
             r["p"]
             for r in rows
@@ -390,7 +285,6 @@ def make_plot(curve_rows):
             for r in rows
         ])
 
-
         plt.plot(
             x,
             y,
@@ -399,7 +293,6 @@ def make_plot(curve_rows):
             markersize=6,
             label=f"N={N}",
         )
-
 
     plt.xlabel("p")
     plt.ylabel("% Failure")
@@ -419,11 +312,6 @@ def make_plot(curve_rows):
 
     plt.show()
 
-
-# ============================================================
-# MAIN EXPERIMENT
-# ============================================================
-
 def main():
 
     all_rows = []
@@ -431,7 +319,6 @@ def main():
     critical_rows = []
 
     total_start = time.perf_counter()
-
 
     print("=" * 80)
     print(
@@ -461,11 +348,6 @@ def main():
         f"{P_VALUES}"
     )
 
-
-    # ========================================================
-    # LOOP OVER NETWORK SIZES
-    # ========================================================
-
     for N in N_VALUES:
 
         print("\n" + "=" * 80)
@@ -476,13 +358,7 @@ def main():
 
         print("=" * 80)
 
-
         rows_for_N = []
-
-
-        # ====================================================
-        # LOOP OVER p VALUES
-        # ====================================================
 
         for p_index, p in enumerate(
             P_VALUES,
@@ -496,18 +372,12 @@ def main():
 
             p_start = time.perf_counter()
 
-
             print(
                 f"\nN={N} | "
                 f"p={p:.3f} | "
                 f"shortcuts={int(round(p*N))} | "
                 f"{p_index}/{len(P_VALUES)}"
             )
-
-
-            # ================================================
-            # CREATE 100 INDEPENDENT TASKS
-            # ================================================
 
             tasks = [
                 (
@@ -519,18 +389,11 @@ def main():
                 in range(NUM_REALIZATIONS)
             ]
 
-
-            # ================================================
-            # RUN TASKS ON ALL CPU CORES
-            # ================================================
-
             completed = 0
-
 
             with ProcessPoolExecutor(
                 max_workers=MAX_WORKERS
             ) as executor:
-
 
                 futures = [
 
@@ -543,11 +406,6 @@ def main():
 
                 ]
 
-
-                # ============================================
-                # COLLECT RESULTS AS THEY FINISH
-                # ============================================
-
                 for future in as_completed(
                     futures
                 ):
@@ -555,7 +413,6 @@ def main():
                     result = future.result()
 
                     all_rows.append(result)
-
 
                     if (
                         result["status"]
@@ -568,9 +425,7 @@ def main():
 
                         failure_count += 1
 
-
                     completed += 1
-
 
                     print(
                         f"\rCompleted "
@@ -586,20 +441,13 @@ def main():
                         flush=True,
                     )
 
-
             print()
-
-
-            # ================================================
-            # FAILURE PROBABILITY
-            # ================================================
 
             pf = (
                 failure_count
                 /
                 NUM_REALIZATIONS
             )
-
 
             se = np.sqrt(
                 pf
@@ -608,7 +456,6 @@ def main():
                 /
                 NUM_REALIZATIONS
             )
-
 
             row = {
 
@@ -645,10 +492,8 @@ def main():
                     p_start,
             }
 
-
             curve_rows.append(row)
             rows_for_N.append(row)
-
 
             print(
                 f"% Failure = "
@@ -660,15 +505,9 @@ def main():
                 f"{row['runtime_seconds']:.2f} s"
             )
 
-
-        # ====================================================
-        # ESTIMATE CRITICAL POINT
-        # ====================================================
-
         p_cr = estimate_p_cr(
             rows_for_N
         )
-
 
         critical_rows.append({
 
@@ -680,19 +519,11 @@ def main():
 
         })
 
-
         print(
             f"\nEstimated p_cr "
             f"for N={N}: "
             f"{p_cr:.5f}"
         )
-
-
-        # ====================================================
-        # SAVE AFTER EACH N
-        #
-        # Prevents losing hours of work if something crashes.
-        # ====================================================
 
         save_results(
             all_rows,
@@ -704,30 +535,15 @@ def main():
             f"Checkpoint saved after N={N}"
         )
 
-
-    # ========================================================
-    # FINAL SAVE
-    # ========================================================
-
     save_results(
         all_rows,
         curve_rows,
         critical_rows,
     )
 
-
-    # ========================================================
-    # PLOT
-    # ========================================================
-
     make_plot(
         curve_rows
     )
-
-
-    # ========================================================
-    # FINAL SUMMARY
-    # ========================================================
 
     print("\n" + "=" * 80)
 
@@ -737,7 +553,6 @@ def main():
 
     print("=" * 80)
 
-
     for row in critical_rows:
 
         print(
@@ -746,7 +561,6 @@ def main():
             f"{row['p_critical']:.5f}"
         )
 
-
     print("\nSaved:")
 
     print(ALL_FILE)
@@ -754,23 +568,16 @@ def main():
     print(PCR_FILE)
     print(FIGURE_FILE)
 
-
     total_runtime = (
         time.perf_counter()
         -
         total_start
     )
 
-
     print(
         f"\nTotal runtime: "
         f"{total_runtime:.2f} s"
     )
-
-
-# ============================================================
-# WINDOWS MULTIPROCESSING GUARD
-# ============================================================
 
 if __name__ == "__main__":
 
