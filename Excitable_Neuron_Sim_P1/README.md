@@ -1,88 +1,52 @@
 # Self-Sustained Activity in Small-World Networks of Excitable Neurons
 
-A computational neuroscience project investigating how network topology, shortcut density, network size, and neuronal excitability influence the emergence of persistent collective activity in networks of excitable neurons.
+A computational neuroscience simulation project exploring how network structure, shortcut density, network size, and neuronal excitability affect the emergence of persistent collective activity.
 
-This project qualitatively reproduces and extends the computational experiments from the study **“Self-Sustained Activity in a Small-World Network of Excitable Neurons.”**
+The experiments are inspired by the study **“Self-Sustained Activity in a Small-World Network of Excitable Neurons.”** The goal is to reproduce the qualitative dynamics and investigate additional topology–activity relationships.
 
-## Objective
+## Research question
 
-The central research question is:
+**When can a brief local stimulus trigger long-lasting activity in a network of excitable neurons?**
 
-> **Under what structural and dynamical conditions can a brief local stimulus generate long-lasting activity in a network of excitable neurons?**
+The project examines travelling excitation waves, small-world connectivity, persistence versus failure, firing-rate dynamics, network topology, and single-neuron excitability.
 
-The project investigates:
+## Model overview
 
-- Local wave propagation
-- Small-world network formation
-- Persistent neuronal activity
-- Failure and success of activity propagation
-- Probability of persistent activity
-- Effects of network size
-- Effects of shortcut density
-- Topology–dynamics relationships
-- Population firing-rate dynamics
-- Single-neuron excitability
-- Extensions beyond the original experiments
+Neurons are arranged initially in a local ring. Additional long-range shortcuts can connect distant neurons. A stimulus is applied, and the simulator records spike times and neuron indices.
 
----
+- **Local connections** support propagation between neighbouring neurons.
+- **Long-range shortcuts** can reinject activity into other parts of the network.
+- **Persistent activity** occurs when activity continues beyond the initial transient; in other realizations, activity dies out.
 
-## Core Model
+The model is a simplified integrate-and-fire network with delayed synaptic events.
 
-The system consists of `N` excitable neurons initially arranged in a local ring network.
+## Parameters
 
-Random long-range connections are then added to create a small-world-like network.
+| Parameter | Meaning |
+|---|---|
+| `N` | Number of neurons |
+| `p` | Shortcut density/probability used by the network experiments |
+| `I_ext` | External input |
+| `g_syn` | Synaptic coupling strength |
+| `tau_m` | Membrane time constant |
+| `tau_D` | Synaptic transmission delay |
+| `dt` | Integration time step |
+| `t_max` | Simulation end time |
+| `stimulus_time` | Time of the initial stimulus |
 
-The network therefore contains:
+The baseline configuration in `config.py` defines `I_EXT = 0.85`, `G_SYN = 0.20`, `TAU_M = 10.0`, `TAU_D = 1.0`, `DT = 0.01`, and `T_MAX = 100.0`. Individual experiment scripts may override these values.
 
-1. **Local connections** for wave propagation
-2. **Long-range shortcuts** for activity reinjection
+## Repository layout
 
-A brief stimulus is applied to one neuron.
-
-The main question is whether the resulting activity:
-
-- dies out quickly, or
-- continues circulating through the network as persistent activity
-
----
-
-## Main Parameters
-
-| Parameter         | Meaning                         |
-| ----------------- | ------------------------------- |
-| `N`             | Number of neurons               |
-| `p`             | Shortcut density                |
-| `I_ext`         | External input/current          |
-| `g_syn`         | Synaptic coupling strength      |
-| `tau_m`         | Membrane time constant          |
-| `tau_D`         | Synaptic transmission delay     |
-| `dt`            | Numerical integration time step |
-| `t_max`         | Simulation end time             |
-| `stimulus_time` | Time of initial stimulation     |
-
-A commonly used paper-style parameter set is:
+This project lives in `Excitable_Neuron_Sim_P1/` within the repository.
 
 ```text
-N       = 1000
-I_ext   = 0.85
-g_syn   = 0.20
-tau_m   = 10.0
-tau_D   = 1.0
-p       = 0.10
-```
-
----
-
-## Project Structure
-
-```text
-Project1/
-│
+Excitable_Neuron_Sim_P1/
 ├── config.py
-├── network.py
 ├── neuron.py
+├── network.py
 ├── simulator.py
-│
+├── phase_1_neuron_characterization.py
 ├── phase_2_local_network.py
 ├── phase_3_small_world_network.py
 ├── phase_4_persistent_activity.py
@@ -102,600 +66,114 @@ Project1/
 ├── phase_19_all_handwritten_experiments.py
 ├── phase_20_single_neuron_FI_curve.py
 ├── phase_21_firing_rate_vs_p_multi_Iext.py
-│
 ├── figures/
+│   └── NEURON/
+│       └── Learn.ipynb
 ├── results/
 └── README.md
 ```
 
----
-
-# Experimental Phases
-
-## Phase 2 — Local Network Wave Propagation
-
-**File:** `phase_2_local_network.py`
-
-### Objective
-
-Construct a purely local ring network and determine whether a brief stimulus produces a travelling wave of neuronal activity.
-
-### Main Idea
-
-Local connectivity allows activity to propagate spatially through neighbouring neurons. However, without long-range connections, the activity eventually disappears.
-
----
-
-## Phase 3 — Small-World Network
-
-**File:** `phase_3_small_world_network.py`
-
-### Objective
-
-Add random long-range shortcuts to the local ring network and study their effect on activity propagation.
-
-The network contains:
-
-```text
-Local propagation
-        +
-Long-range shortcuts
-        ↓
-Possible activity reinjection
-```
-
-Different random network realizations can produce very different dynamical outcomes.
-
----
-
-## Phase 4 — Persistent Activity
-
-**File:** `phase_4_persistent_activity.py`
-
-### Objective
-
-Identify network realizations in which activity persists for long periods.
-
-Two main outcomes are observed.
-
-### Failure
-
-```text
-Stimulus
-   ↓
-Wave propagation
-   ↓
-Activity disappears
-```
-
-### Success
-
-```text
-Stimulus
-   ↓
-Wave propagation
-   ↓
-Shortcut activation
-   ↓
-Activity reinjection
-   ↓
-Repeated propagation
-   ↓
-Persistent activity
-```
-
----
-
-## Phase 5 — Failure vs Success Classification
-
-**File:** `phase_5_failure_classifier.py`
-
-### Objective
-
-Automatically classify each simulation as:
-
-- **Failure**
-- **Success**
-
-The classification is based on whether network activity survives sufficiently long after the initial stimulus.
-
----
-
-## Phase 6 — Probability of Failure
-
-**File:** `phase_6_probability_failure.py`
-
-### Objective
-
-Estimate the probability that network activity fails for a given set of parameters.
-
-For multiple random network realizations:
-
-\[
-P_}
-===
-
-\frac{\text{Number of failed realizations}}
-{\text{Total number of realizations}}
-\]
-
-and:
-
-\[
-P_}
-===
-
-1-P_{\mathrm{failure}}
-\]
-
----
-
-## Phase 7 — Topology–Dynamics Correlation
-
-**File:** `phase_7_topology_correlation.py`
-
-### Objective
-
-Investigate which structural properties of a random shortcut network are associated with persistent activity.
-
-This phase explores whether network topology can explain why some random realizations succeed while others fail.
-
----
-
-## Phase 8 — Shortcut Orientation
-
-**File:** `phase_8_shortcut_orientation.py`
-
-### Objective
-
-Study whether the direction and arrangement of shortcuts influence activity propagation and persistence.
-
-Not all shortcuts are equally useful. A shortcut contributes to persistent activity only when it is activated at the appropriate time and delivers excitation to a region capable of responding.
-
----
-
-## Phase 9 — Dynamic Shortcut Activation
-
-**File:** `phase_9_dynamic_shortcut_activation.py`
-
-### Objective
-
-Examine which shortcuts are actually activated during network dynamics.
-
-This distinguishes between:
-
-- **Structural shortcuts** — connections present in the network
-- **Dynamically active shortcuts** — connections that actually transmit activity during the simulation
-
-A network may contain many shortcuts while only a subset contributes to persistent activity.
-
----
-
-## Phase 10 — Large-N Benchmark
-
-**File:** `phase_10_benchmark_N2000.py`
-
-### Objective
-
-Test computational performance and network dynamics for:
-
-\[
-N=2000
-\]
-
-This phase evaluates whether larger neuronal networks can be simulated efficiently.
-
----
-
-## Phase 11 — Time-Horizon Control
-
-**File:** `phase_11_N2000_time_horizon_control.py`
-
-### Objective
-
-Determine whether apparent persistent activity is a genuine dynamical effect or simply a consequence of the simulation ending too early.
-
-Longer simulation horizons are used as a control.
-
----
-
-## Phase 12 — Failure Probability for N = 2000
-
-**File:** `phase_12_N2000_failure_probability.py`
-
-### Objective
-
-Estimate the probability of failure for a larger network.
-
-This experiment tests whether increasing network size makes persistent activity more reliable.
-
----
-
-## Phase 13 — Failure Probability for Multiple Network Sizes
-
-**File:** `phase_13_multiN_failure_probability.py`
-
-### Objective
-
-Study how persistence probability depends on network size.
-
-Different values of `N` are compared under the same network and neuronal parameters.
-
-The main question is:
-
-> **Does increasing the number of neurons make persistent activity more likely?**
-
----
-
-## Phase 14 — Activity Duration vs Network Size
-
-**File:** `phase_14_duration_vs_N.py`
-
-### Objective
-
-Measure:
-
-\[
-\text{Activity duration}
-\quad \text{vs} \quad
-N
-\]
-
-at fixed shortcut density.
-
-### Main Observation
-
-The results reveal two major populations:
-
-1. Networks in which activity dies early
-2. Networks in which activity survives until the observation limit
-
-This suggests that increasing network size primarily changes the **probability of entering persistent activity**, rather than smoothly increasing activity lifetime.
-
----
-
-## Phase 15 — Paper-Style Raster and Population Firing Rate
-
-**File:** `phase_15_paper_raster_firing_rate.py`
-
-### Objective
-
-Qualitatively reproduce the main structure of the paper figure.
-
-The output contains two panels.
-
-### Top Panel — Spike Raster
-
-\[
-\text{Neuron index vs time}
-\]
-
-The raster shows the spatiotemporal propagation of activity through the network.
-
-### Bottom Panel — Population Firing Rate
-
-\[
-\text{Whole-network firing activity vs time}
-\]
-
-The firing-rate curve reveals periodic collective activity associated with travelling and recurrent excitation waves.
-
----
-
-## Phase 17 — Firing Rate vs Clustering Coefficient
-
-**File:** `phase_17_firing_rate_vs_clustering.py`
-
-### Objective
-
-Investigate whether whole-network firing activity is associated with network clustering.
-
-For neuron \(i\), the local clustering coefficient is:
-
-\[
-C_i
-===
-
-\frac{2e_i}
-{k_i(k_i-1)}
-\]
-
-where:
-
-- \(k_i\) is the degree of neuron \(i\)
-- \(e_i\) is the number of connections among its neighbours
-
-The whole-network mean clustering coefficient is:
-
-\[
-C
-=
-
-\frac{1}{N}
-\sum_{i=1}^{N} C_i
-\]
-
-with:
-
-\[
-0\leq C\leq1
-\]
-
-The final experiment compares:
-
-\[
-\text{Mean firing rate}
-\quad \text{vs} \quad
-C
-\]
-
----
-
-## Phase 18 — Firing Rate vs Shortcut Density
-
-**File:** `PHASE_18_Firing_rate_vs_density.py`
-
-### Objective
-
-For a fixed network size:
-
-\[
-N=1000
-\]
-
-measure how whole-network firing activity changes as shortcut density varies:
-
-\[
-p:0\rightarrow1
-\]
-
-The mean firing rate is calculated as:
-
-\[
-\bar r
-======
-
-\frac{\text{Total post-stimulus spikes}}
-{N(T_{\max}-T_{\mathrm{stimulus}})}
-\]
-
-The final graph is:
-
-\[
-\text{Mean whole-network firing rate}
-\quad \text{vs} \quad
-p
-\]
-
-The main research question is:
-
-> **Is there an optimal shortcut-density regime for sustained collective activity?**
-
----
-
-## Phase 19 — Combined Extended Experiments
-
-**File:** `phase_19_all_handwritten_experiments.py`
-
-### Objective
-
-Combine additional topology and dynamics experiments developed during the project.
-
-This phase extends the investigation beyond direct qualitative reproduction of the original study.
-
----
-
-## Phase 20 — Single-Neuron F–I Curve
-
-**File:** `phase_20_single_neuron_FI_curve.py`
-
-### Objective
-
-Characterize the intrinsic response of an individual neuron before interpreting whole-network behaviour.
-
-The experiment measures:
-
-\[
-\text{Firing rate}
-\quad \text{vs} \quad
-I_{\mathrm{ext}}
-\]
-
-This produces the single-neuron frequency–current or **F–I curve**.
-
-The purpose is to distinguish:
-
-- single-neuron excitability
-- collective network effects
-
----
-
-## Phase 21 — Firing Rate vs Shortcut Density for Multiple External Inputs
-
-**File:** `phase_21_firing_rate_vs_p_multi_Iext.py`
-
-### Objective
-
-Extend the firing-rate experiment by varying both:
-
-\[
-p
-\]
-
-and:
-
-\[
-I_{\mathrm{ext}}
-\]
-
-The final result compares multiple curves:
-
-\[
-\bar r(p)
-\]
-
-for different external-input levels.
-
-This experiment determines whether the effect of network topology depends on neuronal excitability.
-
----
-
-# Firing Rate Calculation
-
-The mean whole-network firing rate is calculated as:
-
-\[
-\bar r
-======
-
-\frac{N_{\mathrm{spikes}}}
-{N\,T_{\mathrm{analysis}}}
-\]
-
-where:
-
-\[
-T_}
-===
-
-T_
---
-
-T_{\mathrm{stimulus}}
-\]
-
-For example, with:
-
-```text
-N = 1000
-T_max = 400
-Stimulus time = 10
-```
-
-the post-stimulus analysis duration is:
-
-\[
-400-10=390
-\]
-
-Therefore:
-
-\[
-\bar r
-======
-
-\frac{\text{Post-stimulus spike count}}
-{1000\times390}
-\]
-
-The default unit is:
-
-```text
-spikes / neuron / model-time-unit
-```
-
-If one model time unit is explicitly interpreted as one millisecond, the value can be converted to Hz by multiplying by `1000`.
-
----
-
-# Main Findings So Far
-
-The simulations suggest that:
-
-1. Local connectivity supports travelling excitation waves.
-2. Local propagation alone is generally insufficient for indefinite activity.
-3. Long-range shortcuts can reinject excitation into recovered network regions.
-4. Persistent activity depends strongly on the exact random network realization.
-5. Increasing network size increases the probability of persistent activity.
-6. Activity duration often shows two regimes: rapid failure or persistence to the observation limit.
-7. Intermediate shortcut densities may support stronger collective activity than very low or very high shortcut densities.
-8. Static topology alone may not fully explain persistence.
-9. Dynamically activated shortcuts may be more informative than the total number of structural shortcuts.
-10. Network topology and neuronal excitability jointly control collective firing dynamics.
-
----
-
-# Running the Project
-
-Install the required packages:
+The phase scripts are separate experiments. The shared modules provide model configuration, neuron updates, network construction, and simulation logic. The notebook under `figures/NEURON/` is retained for code-based exploration.
+
+## Experimental phases
+
+| Phase | Script | Focus |
+|---|---|---|
+| 1 | `phase_1_neuron_characterization.py` | Single-neuron response and characterization |
+| 2 | `phase_2_local_network.py` | Wave propagation in a local ring |
+| 3 | `phase_3_small_world_network.py` | Adding long-range shortcuts |
+| 4 | `phase_4_persistent_activity.py` | Persistent activity versus activity failure |
+| 5 | `phase_5_failure_classifier.py` | Classifying simulation outcomes |
+| 6 | `phase_6_probability_failure.py` | Estimating failure probability across realizations |
+| 7 | `phase_7_topology_correlation.py` | Network topology and activity outcomes |
+| 8 | `phase_8_shortcut_orientation.py` | Influence of shortcut orientation |
+| 9 | `phase_9_dynamic_shortcut_activation.py` | Which shortcuts are activated during dynamics |
+| 10 | `phase_10_benchmark_N2000.py` | Benchmarking a network with 2,000 neurons |
+| 11 | `phase_11_N2000_time_horizon_control.py` | Checking sensitivity to the simulation time horizon |
+| 12 | `phase_12_N2000_failure_probability.py` | Failure probability for a large network |
+| 13 | `phase_13_multiN_failure_probability.py` | Comparing multiple network sizes |
+| 14 | `phase_14_duration_vs_N.py` | Activity duration versus network size |
+| 15 | `phase_15_paper_raster_firing_rate.py` | Spike raster and population firing-rate plots |
+| 17 | `phase_17_firing_rate_vs_clustering.py` | Firing rate versus clustering coefficient |
+| 18 | `PHASE_18_Firing_rate_vs_density.py` | Firing rate versus shortcut density |
+| 19 | `phase_19_all_handwritten_experiments.py` | Combined extended experiments |
+| 20 | `phase_20_single_neuron_FI_curve.py` | Single-neuron frequency–current (F–I) curve |
+| 21 | `phase_21_firing_rate_vs_p_multi_Iext.py` | Shortcut density across external-input levels |
+
+Phase 16 is not present in the current script set.
+
+## Installation
+
+Use Python 3.10 or newer, then install the core dependencies:
 
 ```bash
-pip install numpy matplotlib
+python -m pip install numpy matplotlib
 ```
 
-Run any experiment independently:
+Some experiment scripts may require additional packages depending on the analyses they perform. Install any missing dependency reported by the specific script when running it.
+
+## Running an experiment
+
+From the repository root:
 
 ```bash
+python Excitable_Neuron_Sim_P1/phase_4_persistent_activity.py
+```
+
+Or move into the project directory first:
+
+```bash
+cd Excitable_Neuron_Sim_P1
 python phase_4_persistent_activity.py
 ```
 
-For the paper-style raster and firing-rate figure:
+Other useful entry points include:
 
 ```bash
 python phase_15_paper_raster_firing_rate.py
-```
-
-For firing rate vs shortcut density:
-
-```bash
 python PHASE_18_Firing_rate_vs_density.py
-```
-
-For the single-neuron F–I curve:
-
-```bash
 python phase_20_single_neuron_FI_curve.py
-```
-
-For firing rate vs shortcut density at multiple external inputs:
-
-```bash
 python phase_21_firing_rate_vs_p_multi_Iext.py
 ```
 
----
+Run each experiment independently and check its settings and output paths before launching large parameter sweeps.
 
-# Output
+## Firing-rate definition
 
-Generated numerical results are stored in:
+For a post-stimulus analysis window, the mean firing rate per neuron is
 
-```text
-results/
-```
+\[
+\bar r = \frac{N_{\mathrm{spikes}}}{N\,T_{\mathrm{analysis}}}
+\]
 
-Generated figures are stored in:
+where \(N_{\mathrm{spikes}}\) is the number of spikes counted in the analysis window, \(N\) is the number of neurons, and \(T_{\mathrm{analysis}}\) is the duration of that window. The unit is spikes per neuron per model-time-unit. Convert to hertz only when the model time unit is known to represent a millisecond.
 
-```text
-figures/
-```
+For example, if the analysis starts at \(t_{\mathrm{stimulus}}\) and ends at \(t_{\max}\),
 
-Some experiments also create their own phase-specific output directories.
+\[
+T_{\mathrm{analysis}} = t_{\max} - t_{\mathrm{stimulus}}.
+\]
 
----
+## Outputs
 
-# Research Extensions
+- `figures/` — plots and figure-related files.
+- `results/` — numerical results and experiment outputs.
 
-Possible future extensions include:
+Output filenames and subdirectories can vary by script.
 
-- Critical network-size estimation
-- Finite-size scaling
-- Transition boundaries in the \((N,p)\) parameter space
-- Longer time-horizon controls
-- Topology-conditioned persistence analysis
-- Dynamically active shortcut networks
-- Clustering and path-length analysis
-- Firing-rate phase diagrams
-- Multiple neuronal excitability regimes
-- Comparison with alternative excitable-neuron models
+## Interpreting the experiments
 
----
+The project is designed to test hypotheses rather than assume one outcome for every network. Results can vary with random network realizations, model parameters, and simulation duration. The experiments investigate whether:
 
-# Scientific Scope
+- local connectivity alone is sufficient for long-lasting activity;
+- shortcuts change the likelihood of activity persistence;
+- persistence probability depends on network size;
+- structural shortcuts and dynamically activated shortcuts tell different stories;
+- firing rate depends on shortcut density, clustering, and external input;
+- single-neuron excitability helps explain collective network behaviour.
 
-This repository is a computational exploration and qualitative extension of small-world excitable neuronal network dynamics.
+These are questions to evaluate from the generated results; conclusions should be reported with the relevant parameters, number of realizations, and simulation horizon.
 
-The central goal is to understand:
+## Scope and possible extensions
 
-> **How does network structure control the transition from transient travelling waves to self-sustained collective neuronal activity?**
-
----
+This repository is a computational exploration of excitable-neuron network dynamics. Potential extensions include finite-size scaling, persistence maps over \((N,p)\), longer time-horizon controls, topology-conditioned analysis, and comparisons with alternative neuronal models.
