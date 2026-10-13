@@ -55,13 +55,7 @@ from network import (
 
 from simulator import run_simulation
 
-
-# ============================================================
-# PATH SETUP
-# ============================================================
-
 PROJECT_DIR = Path(__file__).resolve().parent
-
 
 PHASE6_DIR = (
     PROJECT_DIR
@@ -69,44 +63,30 @@ PHASE6_DIR = (
     / "phase6"
 )
 
-
 RESULTS_DIR = (
     PROJECT_DIR
     / "results"
     / "phase9"
 )
 
-
 RESULTS_DIR.mkdir(
     parents=True,
     exist_ok=True,
 )
-
 
 PHASE6_ALL_FILE = (
     PHASE6_DIR
     / "phase6_all_realizations.csv"
 )
 
-
 PHASE6_PROBABILITY_FILE = (
     PHASE6_DIR
     / "phase6_probability_curve.csv"
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 100
 
 STIMULUS_NEURON = N // 2
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 
@@ -116,55 +96,21 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 
 T_MAX = 200.0
 
 STIMULUS_TIME = 10.0
 
-
-# ============================================================
-# SHORTCUT ACTIVATION WINDOW
-# ============================================================
-
-# IMPORTANT:
-#
-# These values should eventually be matched to the
-# actual temporal behavior of your simulator.
-#
-# First exploratory window:
-
 MIN_DELAY = 0.0
 
 MAX_DELAY = 2.0
 
-
-# ============================================================
-# p SELECTION
-# ============================================================
-
-# None:
-#
-# automatically select the mixed p closest
-# to P_success = 0.5
-
 MANUAL_P = None
-
-
-# ============================================================
-# READ CSV
-# ============================================================
 
 def read_csv(file_path):
 
-
     if not file_path.exists():
-
 
         raise FileNotFoundError(
 
@@ -176,7 +122,6 @@ def read_csv(file_path):
 
         )
 
-
     with open(
 
         file_path,
@@ -187,17 +132,11 @@ def read_csv(file_path):
 
     ) as file:
 
-
         return list(
 
             csv.DictReader(file)
 
         )
-
-
-# ============================================================
-# CIRCULAR DISTANCE
-# ============================================================
 
 def circular_distance(
 
@@ -209,7 +148,6 @@ def circular_distance(
 
 ):
 
-
     direct_distance = abs(
 
         neuron_b
@@ -218,7 +156,6 @@ def circular_distance(
 
     )
 
-
     return min(
 
         direct_distance,
@@ -226,11 +163,6 @@ def circular_distance(
         N - direct_distance,
 
     )
-
-
-# ============================================================
-# SHORTCUT ORIENTATION
-# ============================================================
 
 def shortcut_orientation(
 
@@ -243,7 +175,6 @@ def shortcut_orientation(
     N,
 
 ):
-
 
     source_distance = (
 
@@ -259,7 +190,6 @@ def shortcut_orientation(
 
     )
 
-
     target_distance = (
 
         circular_distance(
@@ -274,7 +204,6 @@ def shortcut_orientation(
 
     )
 
-
     delta_d = (
 
         target_distance
@@ -283,24 +212,17 @@ def shortcut_orientation(
 
     )
 
-
     if delta_d < 0:
-
 
         orientation = "TOWARD"
 
-
     elif delta_d > 0:
-
 
         orientation = "AWAY"
 
-
     else:
 
-
         orientation = "NEUTRAL"
-
 
     return (
 
@@ -314,20 +236,13 @@ def shortcut_orientation(
 
     )
 
-
-# ============================================================
-# SELECT TRANSITION p
-# ============================================================
-
 def select_transition_p(
 
     probability_rows,
 
 ):
 
-
     if MANUAL_P is not None:
-
 
         return float(
 
@@ -335,19 +250,15 @@ def select_transition_p(
 
         )
 
-
     candidates = []
 
-
     for row in probability_rows:
-
 
         p = float(
 
             row["p"]
 
         )
-
 
         p_success = float(
 
@@ -359,7 +270,6 @@ def select_transition_p(
 
         )
 
-
         if (
 
             p_success > 0.0
@@ -369,7 +279,6 @@ def select_transition_p(
             p_success < 1.0
 
         ):
-
 
             candidates.append(
 
@@ -389,16 +298,13 @@ def select_transition_p(
 
             )
 
-
     if len(candidates) == 0:
-
 
         raise RuntimeError(
 
             "No mixed transition p found."
 
         )
-
 
     candidates.sort(
 
@@ -408,13 +314,7 @@ def select_transition_p(
 
     )
 
-
     return candidates[0][1]
-
-
-# ============================================================
-# ORGANIZE SPIKES BY NEURON
-# ============================================================
 
 def build_spike_lookup(
 
@@ -426,7 +326,6 @@ def build_spike_lookup(
 
 ):
 
-
     spike_lookup = [
 
         []
@@ -435,7 +334,6 @@ def build_spike_lookup(
 
     ]
 
-
     for time, neuron in zip(
 
         spike_times,
@@ -443,7 +341,6 @@ def build_spike_lookup(
         spike_neurons,
 
     ):
-
 
         spike_lookup[
 
@@ -454,7 +351,6 @@ def build_spike_lookup(
             float(time)
 
         )
-
 
     return [
 
@@ -472,11 +368,6 @@ def build_spike_lookup(
 
     ]
 
-
-# ============================================================
-# ANALYZE ONE SHORTCUT
-# ============================================================
-
 def analyze_shortcut_activation(
 
     source,
@@ -491,13 +382,11 @@ def analyze_shortcut_activation(
 
 ):
 
-
     source_spikes = (
 
         spike_lookup[source]
 
     )
-
 
     target_spikes = (
 
@@ -505,13 +394,7 @@ def analyze_shortcut_activation(
 
     )
 
-
-    # --------------------------------------------------------
-    # SOURCE NEVER FIRED
-    # --------------------------------------------------------
-
     if len(source_spikes) == 0:
-
 
         return {
 
@@ -545,18 +428,11 @@ def analyze_shortcut_activation(
 
         }
 
-
-    # --------------------------------------------------------
-    # SEARCH TEMPORAL ACTIVATIONS
-    # --------------------------------------------------------
-
     activation_delays = []
 
     activation_times = []
 
-
     for source_time in source_spikes:
-
 
         earliest_target_time = (
 
@@ -566,7 +442,6 @@ def analyze_shortcut_activation(
 
         )
 
-
         latest_target_time = (
 
             source_time
@@ -574,7 +449,6 @@ def analyze_shortcut_activation(
             + max_delay
 
         )
-
 
         candidate_targets = (
 
@@ -602,16 +476,13 @@ def analyze_shortcut_activation(
 
         )
 
-
         if len(candidate_targets) > 0:
-
 
             first_target_time = (
 
                 candidate_targets[0]
 
             )
-
 
             delay = (
 
@@ -621,13 +492,11 @@ def analyze_shortcut_activation(
 
             )
 
-
             activation_delays.append(
 
                 delay
 
             )
-
 
             activation_times.append(
 
@@ -635,17 +504,11 @@ def analyze_shortcut_activation(
 
             )
 
-
-    # --------------------------------------------------------
-    # SUMMARY
-    # --------------------------------------------------------
-
     activation_count = len(
 
         activation_delays
 
     )
-
 
     activation_fraction = (
 
@@ -655,16 +518,13 @@ def analyze_shortcut_activation(
 
     )
 
-
     if activation_count > 0:
-
 
         first_activation = float(
 
             activation_times[0]
 
         )
-
 
         mean_delay = float(
 
@@ -676,14 +536,11 @@ def analyze_shortcut_activation(
 
         )
 
-
     else:
-
 
         first_activation = np.nan
 
         mean_delay = np.nan
-
 
     return {
 
@@ -721,13 +578,7 @@ def analyze_shortcut_activation(
 
     }
 
-
-# ============================================================
-# HEADER
-# ============================================================
-
 print("=" * 80)
-
 
 print(
 
@@ -735,16 +586,13 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
     "\nQuestion:"
 
 )
-
 
 print(
 
@@ -754,13 +602,11 @@ print(
 
 )
 
-
 print(
 
     "\nPutative activation window:"
 
 )
-
 
 print(
 
@@ -770,17 +616,11 @@ print(
 
 )
 
-
-# ============================================================
-# LOAD PHASE 6 RESULTS
-# ============================================================
-
 all_phase6_rows = read_csv(
 
     PHASE6_ALL_FILE
 
 )
-
 
 probability_rows = read_csv(
 
@@ -788,17 +628,11 @@ probability_rows = read_csv(
 
 )
 
-
-# ============================================================
-# SELECT p
-# ============================================================
-
 selected_p = select_transition_p(
 
     probability_rows
 
 )
-
 
 print(
 
@@ -807,11 +641,6 @@ print(
     selected_p,
 
 )
-
-
-# ============================================================
-# SELECT NETWORK REALIZATIONS
-# ============================================================
 
 selected_rows = [
 
@@ -833,7 +662,6 @@ selected_rows = [
 
 ]
 
-
 success_count = sum(
 
     row["status"]
@@ -845,7 +673,6 @@ success_count = sum(
     in selected_rows
 
 )
-
 
 failure_count = sum(
 
@@ -859,7 +686,6 @@ failure_count = sum(
 
 )
 
-
 print(
 
     "Realizations =",
@@ -867,7 +693,6 @@ print(
     len(selected_rows),
 
 )
-
 
 print(
 
@@ -877,7 +702,6 @@ print(
 
 )
 
-
 print(
 
     "Failures =",
@@ -886,25 +710,13 @@ print(
 
 )
 
-
-# ============================================================
-# STORAGE
-# ============================================================
-
 shortcut_results = []
 
 network_results = []
 
-
-# ============================================================
-# RERUN EXACT NETWORKS
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -912,9 +724,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 for network_index, phase6_row in enumerate(
 
@@ -922,13 +732,11 @@ for network_index, phase6_row in enumerate(
 
 ):
 
-
     seed = int(
 
         phase6_row["seed"]
 
     )
-
 
     expected_status = (
 
@@ -936,17 +744,11 @@ for network_index, phase6_row in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # REBUILD EXACT NETWORK
-    # --------------------------------------------------------
-
     local_network = (
 
         build_ring_network(N)
 
     )
-
 
     network, shortcuts = (
 
@@ -963,11 +765,6 @@ for network_index, phase6_row in enumerate(
         )
 
     )
-
-
-    # --------------------------------------------------------
-    # RERUN SIMULATION
-    # --------------------------------------------------------
 
     spike_times, spike_neurons = (
 
@@ -1013,11 +810,6 @@ for network_index, phase6_row in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # BUILD SPIKE LOOKUP
-    # --------------------------------------------------------
-
     spike_lookup = (
 
         build_spike_lookup(
@@ -1032,11 +824,6 @@ for network_index, phase6_row in enumerate(
 
     )
 
-
-    # --------------------------------------------------------
-    # NETWORK COUNTERS
-    # --------------------------------------------------------
-
     active_shortcut_count = 0
 
     total_activation_events = 0
@@ -1049,11 +836,6 @@ for network_index, phase6_row in enumerate(
 
     active_away_shortcuts = 0
 
-
-    # --------------------------------------------------------
-    # ANALYZE EVERY SHORTCUT
-    # --------------------------------------------------------
-
     for shortcut_index, (
 
         source,
@@ -1061,7 +843,6 @@ for network_index, phase6_row in enumerate(
         target,
 
     ) in enumerate(shortcuts):
-
 
         (
 
@@ -1084,7 +865,6 @@ for network_index, phase6_row in enumerate(
             N,
 
         )
-
 
         activation = (
 
@@ -1114,11 +894,6 @@ for network_index, phase6_row in enumerate(
 
         )
 
-
-        # ----------------------------------------------------
-        # COUNT ACTIVE SHORTCUT
-        # ----------------------------------------------------
-
         is_active = (
 
             activation[
@@ -1131,28 +906,17 @@ for network_index, phase6_row in enumerate(
 
         )
 
-
         if is_active:
-
 
             active_shortcut_count += 1
 
-
             if orientation == "TOWARD":
-
 
                 active_toward_shortcuts += 1
 
-
             elif orientation == "AWAY":
 
-
                 active_away_shortcuts += 1
-
-
-        # ----------------------------------------------------
-        # COUNT EVENTS
-        # ----------------------------------------------------
 
         event_count = (
 
@@ -1164,16 +928,13 @@ for network_index, phase6_row in enumerate(
 
         )
 
-
         total_activation_events += (
 
             event_count
 
         )
 
-
         if orientation == "TOWARD":
-
 
             toward_activation_events += (
 
@@ -1181,20 +942,13 @@ for network_index, phase6_row in enumerate(
 
             )
 
-
         elif orientation == "AWAY":
-
 
             away_activation_events += (
 
                 event_count
 
             )
-
-
-        # ----------------------------------------------------
-        # STORE SHORTCUT RESULT
-        # ----------------------------------------------------
 
         shortcut_results.append({
 
@@ -1296,17 +1050,11 @@ for network_index, phase6_row in enumerate(
 
         })
 
-
-    # --------------------------------------------------------
-    # NETWORK SUMMARY
-    # --------------------------------------------------------
-
     total_shortcuts = len(
 
         shortcuts
 
     )
-
 
     active_fraction = (
 
@@ -1319,7 +1067,6 @@ for network_index, phase6_row in enumerate(
         else 0.0
 
     )
-
 
     network_results.append({
 
@@ -1387,11 +1134,6 @@ for network_index, phase6_row in enumerate(
 
     })
 
-
-    # --------------------------------------------------------
-    # PRINT NETWORK RESULT
-    # --------------------------------------------------------
-
     print(
 
         f"{network_index + 1:3d}/"
@@ -1418,11 +1160,6 @@ for network_index, phase6_row in enumerate(
 
     )
 
-
-# ============================================================
-# SAVE SHORTCUT-LEVEL RESULTS
-# ============================================================
-
 shortcut_file = (
 
     RESULTS_DIR
@@ -1430,7 +1167,6 @@ shortcut_file = (
     / "phase9_shortcut_activation_events.csv"
 
 )
-
 
 with open(
 
@@ -1441,7 +1177,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1457,20 +1192,13 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
         shortcut_results
 
     )
-
-
-# ============================================================
-# SAVE NETWORK-LEVEL RESULTS
-# ============================================================
 
 network_file = (
 
@@ -1479,7 +1207,6 @@ network_file = (
     / "phase9_network_dynamic_summary.csv"
 
 )
-
 
 with open(
 
@@ -1490,7 +1217,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1506,20 +1232,13 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
         network_results
 
     )
-
-
-# ============================================================
-# SUCCESS VS FAILURE COMPARISON
-# ============================================================
 
 features = [
 
@@ -1539,12 +1258,9 @@ features = [
 
 ]
 
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1552,15 +1268,11 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 comparison_results = []
 
-
 for feature in features:
-
 
     success_values = np.array(
 
@@ -1580,7 +1292,6 @@ for feature in features:
 
     )
 
-
     failure_values = np.array(
 
         [
@@ -1599,7 +1310,6 @@ for feature in features:
 
     )
 
-
     success_mean = float(
 
         np.mean(
@@ -1609,7 +1319,6 @@ for feature in features:
         )
 
     )
-
 
     failure_mean = float(
 
@@ -1621,7 +1330,6 @@ for feature in features:
 
     )
 
-
     difference = (
 
         success_mean
@@ -1629,7 +1337,6 @@ for feature in features:
         - failure_mean
 
     )
-
 
     comparison_results.append({
 
@@ -1651,7 +1358,6 @@ for feature in features:
 
     })
 
-
     print(
 
         f"{feature:35s} | "
@@ -1670,11 +1376,6 @@ for feature in features:
 
     )
 
-
-# ============================================================
-# SAVE COMPARISON
-# ============================================================
-
 comparison_file = (
 
     RESULTS_DIR
@@ -1682,7 +1383,6 @@ comparison_file = (
     / "phase9_dynamic_group_comparison.csv"
 
 )
-
 
 with open(
 
@@ -1693,7 +1393,6 @@ with open(
     newline="",
 
 ) as file:
-
 
     writer = csv.DictWriter(
 
@@ -1713,20 +1412,13 @@ with open(
 
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
 
         comparison_results
 
     )
-
-
-# ============================================================
-# MAIN FIGURE
-# ============================================================
 
 success_toward_events = [
 
@@ -1744,7 +1436,6 @@ success_toward_events = [
 
 ]
 
-
 failure_toward_events = [
 
     row[
@@ -1761,13 +1452,11 @@ failure_toward_events = [
 
 ]
 
-
 plt.figure(
 
     figsize=(8, 6)
 
 )
-
 
 plt.boxplot(
 
@@ -1789,7 +1478,6 @@ plt.boxplot(
 
 )
 
-
 plt.ylabel(
 
     "Putative activation events through\n"
@@ -1797,7 +1485,6 @@ plt.ylabel(
     "return-oriented shortcuts"
 
 )
-
 
 plt.title(
 
@@ -1807,9 +1494,7 @@ plt.title(
 
 )
 
-
 plt.tight_layout()
-
 
 figure_file = (
 
@@ -1818,7 +1503,6 @@ figure_file = (
     / "phase9_dynamic_return_shortcut_use.png"
 
 )
-
 
 plt.savefig(
 
@@ -1830,13 +1514,7 @@ plt.savefig(
 
 )
 
-
 plt.show()
-
-
-# ============================================================
-# FINAL MECHANISM TEST
-# ============================================================
 
 success_mean = float(
 
@@ -1848,7 +1526,6 @@ success_mean = float(
 
 )
 
-
 failure_mean = float(
 
     np.mean(
@@ -1859,12 +1536,9 @@ failure_mean = float(
 
 )
 
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1872,9 +1546,7 @@ print(
 
 )
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1886,7 +1558,6 @@ print(
 
 )
 
-
 print(
 
     "Mean return-shortcut events "
@@ -1897,16 +1568,13 @@ print(
 
 )
 
-
 if success_mean > failure_mean:
-
 
     print(
 
         "\nDYNAMIC HYPOTHESIS SUPPORTED"
 
     )
-
 
     print(
 
@@ -1916,9 +1584,7 @@ if success_mean > failure_mean:
 
     )
 
-
 else:
-
 
     print(
 
@@ -1926,22 +1592,13 @@ else:
 
     )
 
-
-# ============================================================
-# OUTPUT FILES
-# ============================================================
-
 print("\n")
 
-
 print("=" * 80)
-
 
 print("RESULTS SAVED")
 
-
 print("=" * 80)
-
 
 print(
 
@@ -1949,13 +1606,11 @@ print(
 
 )
 
-
 print(
 
     shortcut_file
 
 )
-
 
 print(
 
@@ -1963,13 +1618,11 @@ print(
 
 )
 
-
 print(
 
     network_file
 
 )
-
 
 print(
 
@@ -1977,13 +1630,11 @@ print(
 
 )
 
-
 print(
 
     comparison_file
 
 )
-
 
 print(
 
@@ -1991,21 +1642,16 @@ print(
 
 )
 
-
 print(
 
     figure_file
 
 )
 
-
 print("\n")
-
 
 print("=" * 80)
 
-
 print("PHASE 9 COMPLETE")
-
 
 print("=" * 80)
