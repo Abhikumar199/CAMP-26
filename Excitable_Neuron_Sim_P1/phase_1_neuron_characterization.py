@@ -19,18 +19,8 @@ from neuron import (
     analytical_recovery_time,
 )
 
-
-# --------------------------------------------------
-# Create output folders
-# --------------------------------------------------
-
 os.makedirs("figures", exist_ok=True)
 os.makedirs("results", exist_ok=True)
-
-
-# ==================================================
-# CORE SINGLE-NEURON SIMULATOR
-# ==================================================
 
 def simulate_neuron(
     I_ext=I_EXT,
@@ -77,20 +67,12 @@ def simulate_neuron(
 
     for k, t in enumerate(times):
 
-        # ------------------------------------------
-        # 1. Passive membrane evolution
-        # ------------------------------------------
-
         V = update_voltage(
             V=V,
             I_ext=I_ext,
             tau_m=tau_m,
             dt=dt,
         )
-
-        # ------------------------------------------
-        # 2. Check for incoming synaptic events
-        # ------------------------------------------
 
         for input_time in input_times:
 
@@ -101,12 +83,7 @@ def simulate_neuron(
                     g_syn=g_syn,
                 )
 
-        # Store voltage before reset
         voltage[k] = V
-
-        # ------------------------------------------
-        # 3. Threshold and reset
-        # ------------------------------------------
 
         V, spiked = check_and_reset(
             V=V,
@@ -118,13 +95,3 @@ def simulate_neuron(
             spike_times.append(t)
 
     return times, voltage, spike_times
-
-
-
-
-# 1. Resting behaviour
-# 2. Response to one synaptic input
-# 3. Effect of I_ext
-# 4. Effect of g_syn
-# 5. Effect of tau_m
-# 6. Validation of analytical recovery time
