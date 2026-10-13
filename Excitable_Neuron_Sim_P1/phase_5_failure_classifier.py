@@ -1,23 +1,4 @@
-# git """
-# phase_5_failure_classifier.py
 
-# PHASE 5
-# -------
-
-# Automatically classify different network realizations as:
-
-#     SUCCESS
-#     FAILURE
-
-# and measure:
-
-#     - total spikes
-#     - last spike time
-#     - persistence duration
-#     - spikes in final observation window
-
-# This implements project task (e).
-# """
 
 from pathlib import Path
 import csv
@@ -30,11 +11,6 @@ from network import (
 )
 
 from simulator import run_simulation
-
-
-# ============================================================
-# PATH SETUP
-# ============================================================
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
@@ -49,20 +25,10 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 100
 P = 0.1
 
 N_REALIZATIONS = 20
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 G_SYN = 0.20
@@ -70,32 +36,17 @@ G_SYN = 0.20
 TAU_M = 10.0
 TAU_D = 1.0
 
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
-
 DT = 0.01
 T_MAX = 200.0
 
 STIMULUS_NEURON = N // 2
 STIMULUS_TIME = 10.0
 
-
-# ============================================================
-# CLASSIFIER PARAMETERS
-# ============================================================
-
 FINAL_WINDOW = 20.0
 
 FINAL_WINDOW_START = (
     T_MAX - FINAL_WINDOW
 )
-
-
-# ============================================================
-# PERSISTENCE CLASSIFIER
-# ============================================================
 
 def classify_activity(
     spike_times,
@@ -122,11 +73,6 @@ def classify_activity(
         dtype=float,
     )
 
-
-    # --------------------------------------------------------
-    # NO SPIKES
-    # --------------------------------------------------------
-
     if len(spike_times) == 0:
 
         return {
@@ -144,19 +90,9 @@ def classify_activity(
             "spikes_in_final_window": 0,
         }
 
-
-    # --------------------------------------------------------
-    # LAST SPIKE TIME
-    # --------------------------------------------------------
-
     last_spike_time = float(
         spike_times[-1]
     )
-
-
-    # --------------------------------------------------------
-    # PERSISTENCE DURATION
-    # --------------------------------------------------------
 
     persistence_duration = max(
 
@@ -166,17 +102,11 @@ def classify_activity(
         - stimulus_time
     )
 
-
-    # --------------------------------------------------------
-    # FINAL OBSERVATION WINDOW
-    # --------------------------------------------------------
-
     final_window_start = (
 
         t_max
         - final_window
     )
-
 
     final_spikes = spike_times[
 
@@ -184,22 +114,15 @@ def classify_activity(
         >= final_window_start
     ]
 
-
     spikes_in_final_window = len(
         final_spikes
     )
-
-
-    # --------------------------------------------------------
-    # CLASSIFICATION
-    # --------------------------------------------------------
 
     persistent = (
 
         spikes_in_final_window
         > 0
     )
-
 
     if persistent:
 
@@ -208,7 +131,6 @@ def classify_activity(
     else:
 
         status = "FAILURE"
-
 
     return {
 
@@ -228,11 +150,6 @@ def classify_activity(
             spikes_in_final_window,
     }
 
-
-# ============================================================
-# EXPERIMENT HEADER
-# ============================================================
-
 print("=" * 80)
 
 print(
@@ -240,7 +157,6 @@ print(
 )
 
 print("=" * 80)
-
 
 print("\nNETWORK")
 
@@ -255,7 +171,6 @@ print(
     int(round(P * N)),
 )
 
-
 print("\nNEURON PARAMETERS")
 
 print("-" * 50)
@@ -267,7 +182,6 @@ print("g_syn =", G_SYN)
 print("tau_m =", TAU_M)
 
 print("tau_D =", TAU_D)
-
 
 print("\nCLASSIFICATION RULE")
 
@@ -294,21 +208,11 @@ print(
     "the final observation window"
 )
 
-
-# ============================================================
-# STORAGE
-# ============================================================
-
 results = []
 
 success_count = 0
 
 failure_count = 0
-
-
-# ============================================================
-# RUN REALIZATIONS
-# ============================================================
 
 print("\n")
 
@@ -318,22 +222,11 @@ print("RUNNING NETWORK REALIZATIONS")
 
 print("=" * 80)
 
-
 for seed in range(N_REALIZATIONS):
-
-
-    # --------------------------------------------------------
-    # BUILD LOCAL RING
-    # --------------------------------------------------------
 
     local_network = (
         build_ring_network(N)
     )
-
-
-    # --------------------------------------------------------
-    # ADD RANDOM SHORTCUTS
-    # --------------------------------------------------------
 
     small_world_network, shortcuts = (
         add_random_shortcuts(
@@ -346,11 +239,6 @@ for seed in range(N_REALIZATIONS):
             seed=seed,
         )
     )
-
-
-    # --------------------------------------------------------
-    # RUN SIMULATION
-    # --------------------------------------------------------
 
     spike_times, spike_neurons = (
         run_simulation(
@@ -378,11 +266,6 @@ for seed in range(N_REALIZATIONS):
         )
     )
 
-
-    # --------------------------------------------------------
-    # CLASSIFY
-    # --------------------------------------------------------
-
     result = classify_activity(
 
         spike_times=spike_times,
@@ -396,11 +279,6 @@ for seed in range(N_REALIZATIONS):
             FINAL_WINDOW,
     )
 
-
-    # --------------------------------------------------------
-    # COUNT OUTCOMES
-    # --------------------------------------------------------
-
     if result["persistent"]:
 
         success_count += 1
@@ -408,11 +286,6 @@ for seed in range(N_REALIZATIONS):
     else:
 
         failure_count += 1
-
-
-    # --------------------------------------------------------
-    # STORE RESULT
-    # --------------------------------------------------------
 
     row = {
 
@@ -445,13 +318,7 @@ for seed in range(N_REALIZATIONS):
             ],
     }
 
-
     results.append(row)
-
-
-    # --------------------------------------------------------
-    # PRINT RESULT
-    # --------------------------------------------------------
 
     print(
 
@@ -472,28 +339,17 @@ for seed in range(N_REALIZATIONS):
         f"{result['spikes_in_final_window']:4d}"
     )
 
-
-# ============================================================
-# CALCULATE PROBABILITIES
-# ============================================================
-
 success_probability = (
 
     success_count
     / N_REALIZATIONS
 )
 
-
 failure_probability = (
 
     failure_count
     / N_REALIZATIONS
 )
-
-
-# ============================================================
-# SUMMARY
-# ============================================================
 
 print("\n")
 
@@ -503,14 +359,12 @@ print("PHASE 5 CLASSIFICATION SUMMARY")
 
 print("=" * 80)
 
-
 print(
 
     "Total realizations:",
 
     N_REALIZATIONS
 )
-
 
 print(
 
@@ -519,14 +373,12 @@ print(
     success_count
 )
 
-
 print(
 
     "Failed realizations:",
 
     failure_count
 )
-
 
 print(
 
@@ -535,18 +387,12 @@ print(
     success_probability
 )
 
-
 print(
 
     "Estimated probability of failure:",
 
     failure_probability
 )
-
-
-# ============================================================
-# SUCCESS AND FAILURE SEEDS
-# ============================================================
 
 success_seeds = [
 
@@ -557,7 +403,6 @@ success_seeds = [
     if row["status"] == "SUCCESS"
 ]
 
-
 failure_seeds = [
 
     row["seed"]
@@ -567,13 +412,11 @@ failure_seeds = [
     if row["status"] == "FAILURE"
 ]
 
-
 print("\nSUCCESS SEEDS")
 
 print("-" * 50)
 
 print(success_seeds)
-
 
 print("\nFAILURE SEEDS")
 
@@ -581,18 +424,12 @@ print("-" * 50)
 
 print(failure_seeds)
 
-
-# ============================================================
-# SAVE RESULTS
-# ============================================================
-
 output_file = (
 
     RESULTS_DIR
 
     / "phase5_classification_results.csv"
 )
-
 
 fieldnames = [
 
@@ -615,7 +452,6 @@ fieldnames = [
     "spikes_in_final_window",
 ]
 
-
 with open(
 
     output_file,
@@ -626,7 +462,6 @@ with open(
 
 ) as file:
 
-
     writer = csv.DictWriter(
 
         file,
@@ -634,23 +469,15 @@ with open(
         fieldnames=fieldnames,
     )
 
-
     writer.writeheader()
-
 
     writer.writerows(
         results
     )
 
-
 print("\nResults saved to:")
 
 print(output_file)
-
-
-# ============================================================
-# VALIDATION
-# ============================================================
 
 print("\n")
 
@@ -659,7 +486,6 @@ print("=" * 80)
 print("CLASSIFIER VALIDATION")
 
 print("=" * 80)
-
 
 if (
     success_count > 0
@@ -681,7 +507,6 @@ else:
         "Only one outcome type was found "
         "in this realization sample."
     )
-
 
 print("\n")
 
