@@ -21,7 +21,6 @@ Parameters follow the paper figure:
     p = 0.1
 """
 
-
 from pathlib import Path
 
 import numpy as np
@@ -33,11 +32,6 @@ from network import (
 )
 
 from simulator import run_simulation
-
-
-# ============================================================
-# PATHS
-# ============================================================
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
@@ -57,21 +51,11 @@ FIGURE_FILE = (
     / "paper_style_raster_and_firing_rate.png"
 )
 
-
-# ============================================================
-# NETWORK PARAMETERS
-# ============================================================
-
 N = 1000
 
 P = 0.10
 
 SEED = 3
-
-
-# ============================================================
-# NEURON PARAMETERS
-# ============================================================
 
 I_EXT = 0.85
 
@@ -80,11 +64,6 @@ G_SYN = 0.20
 TAU_M = 10.0
 
 TAU_D = 1.0
-
-
-# ============================================================
-# SIMULATION PARAMETERS
-# ============================================================
 
 DT = 0.01
 
@@ -96,24 +75,9 @@ STIMULUS_NEURON = (
     N // 2
 )
 
-
-# ============================================================
-# FIRING-RATE PARAMETERS
-# ============================================================
-
-# Width of each time bin.
-
 RATE_BIN_WIDTH = 1.0
 
-
-# Moving-average window.
-
 SMOOTH_WINDOW = 5
-
-
-# ============================================================
-# BUILD NETWORK
-# ============================================================
 
 print("=" * 80)
 
@@ -122,7 +86,6 @@ print(
 )
 
 print("=" * 80)
-
 
 print("\nNETWORK")
 
@@ -142,11 +105,9 @@ print("tau_m =", TAU_M)
 
 print("tau_D =", TAU_D)
 
-
 local_network = build_ring_network(
     N
 )
-
 
 network, shortcuts = add_random_shortcuts(
 
@@ -158,19 +119,12 @@ network, shortcuts = add_random_shortcuts(
 
 )
 
-
 print(
     "Number of shortcuts =",
     len(shortcuts),
 )
 
-
-# ============================================================
-# RUN SIMULATION
-# ============================================================
-
 print("\nRUNNING SIMULATION...")
-
 
 spike_times, spike_neurons = run_simulation(
 
@@ -194,37 +148,24 @@ spike_times, spike_neurons = run_simulation(
 
 )
 
-
-# ============================================================
-# CONVERT TO NUMPY ARRAYS
-# ============================================================
-
 spike_times = np.asarray(
     spike_times,
     dtype=float,
 )
-
 
 spike_neurons = np.asarray(
     spike_neurons,
     dtype=int,
 )
 
-
-# ============================================================
-# BASIC RESULTS
-# ============================================================
-
 print("\nRESULTS")
 
 print("-" * 50)
-
 
 print(
     "Total spikes =",
     len(spike_times),
 )
-
 
 if len(spike_times) > 0:
 
@@ -238,16 +179,6 @@ if len(spike_times) > 0:
         f"{np.max(spike_times):.2f}",
     )
 
-
-# ============================================================
-# CALCULATE WHOLE-NETWORK FIRING RATE
-# ============================================================
-
-# ------------------------------------------------------------
-# STEP 1:
-# CREATE TIME BINS
-# ------------------------------------------------------------
-
 rate_bin_edges = np.arange(
 
     0.0,
@@ -258,12 +189,6 @@ rate_bin_edges = np.arange(
 
 )
 
-
-# ------------------------------------------------------------
-# STEP 2:
-# COUNT SPIKES FROM ALL N NEURONS
-# ------------------------------------------------------------
-
 spike_counts, _ = np.histogram(
 
     spike_times,
@@ -272,12 +197,6 @@ spike_counts, _ = np.histogram(
 
 )
 
-
-# ------------------------------------------------------------
-# STEP 3:
-# CALCULATE BIN CENTRES
-# ------------------------------------------------------------
-
 rate_times = (
 
     rate_bin_edges[:-1]
@@ -285,44 +204,6 @@ rate_times = (
     + RATE_BIN_WIDTH / 2.0
 
 )
-
-
-# ------------------------------------------------------------
-# STEP 4:
-# NORMALIZED WHOLE-NETWORK FIRING RATE
-# ------------------------------------------------------------
-
-# This uses spikes from ALL N neurons.
-#
-# Formula:
-#
-#               spikes in time bin
-# r(t) = ----------------------------------
-#          N neurons × time-bin width
-#
-#
-# Example:
-#
-# If:
-#
-#     N = 1000
-#
-# and:
-#
-#     50 spikes occur in a 1-unit bin
-#
-# then:
-#
-#     r(t) = 50 / 1000
-#
-#          = 0.05
-#
-#
-# This gives the same numerical scale
-# shown in the paper:
-#
-# approximately 0.00 to 0.07.
-
 
 population_rate = (
 
@@ -338,11 +219,6 @@ population_rate = (
 
 )
 
-
-# ============================================================
-# SMOOTH FIRING RATE
-# ============================================================
-
 if SMOOTH_WINDOW > 1:
 
     kernel = (
@@ -355,7 +231,6 @@ if SMOOTH_WINDOW > 1:
 
     )
 
-
     smoothed_rate = np.convolve(
 
         population_rate,
@@ -366,7 +241,6 @@ if SMOOTH_WINDOW > 1:
 
     )
 
-
 else:
 
     smoothed_rate = (
@@ -374,11 +248,6 @@ else:
         population_rate
 
     )
-
-
-# ============================================================
-# CREATE PAPER-STYLE FIGURE
-# ============================================================
 
 fig, axes = plt.subplots(
 
@@ -403,22 +272,7 @@ fig, axes = plt.subplots(
 
 )
 
-
-# ============================================================
-# TOP PANEL
-#
-# RASTER OF THE WHOLE NETWORK
-# ============================================================
-
 ax_raster = axes[0]
-
-
-# Every point represents:
-#
-# x = time when a spike occurred
-#
-# y = index of the neuron that fired
-
 
 ax_raster.scatter(
 
@@ -432,7 +286,6 @@ ax_raster.scatter(
 
 )
 
-
 ax_raster.set_ylabel(
 
     "Neuron Index",
@@ -440,7 +293,6 @@ ax_raster.set_ylabel(
     fontsize=13,
 
 )
-
 
 ax_raster.set_xlim(
 
@@ -450,7 +302,6 @@ ax_raster.set_xlim(
 
 )
 
-
 ax_raster.set_ylim(
 
     0,
@@ -458,7 +309,6 @@ ax_raster.set_ylim(
     N,
 
 )
-
 
 ax_raster.set_yticks(
 
@@ -473,7 +323,6 @@ ax_raster.set_yticks(
 
 )
 
-
 ax_raster.tick_params(
 
     axis="both",
@@ -482,15 +331,7 @@ ax_raster.tick_params(
 
 )
 
-
-# ============================================================
-# BOTTOM PANEL
-#
-# WHOLE-NETWORK FIRING RATE
-# ============================================================
-
 ax_rate = axes[1]
-
 
 ax_rate.plot(
 
@@ -502,7 +343,6 @@ ax_rate.plot(
 
 )
 
-
 ax_rate.set_xlabel(
 
     "Time",
@@ -510,7 +350,6 @@ ax_rate.set_xlabel(
     fontsize=13,
 
 )
-
 
 ax_rate.set_ylabel(
 
@@ -520,7 +359,6 @@ ax_rate.set_ylabel(
 
 )
 
-
 ax_rate.set_xlim(
 
     0,
@@ -529,9 +367,6 @@ ax_rate.set_xlim(
 
 )
 
-
-# Same y-axis scale as paper figure.
-
 ax_rate.set_ylim(
 
     0,
@@ -539,7 +374,6 @@ ax_rate.set_ylim(
     0.07,
 
 )
-
 
 ax_rate.set_yticks(
 
@@ -551,7 +385,6 @@ ax_rate.set_yticks(
 
 )
 
-
 ax_rate.tick_params(
 
     axis="both",
@@ -559,11 +392,6 @@ ax_rate.tick_params(
     labelsize=11,
 
 )
-
-
-# ============================================================
-# X-AXIS TICKS
-# ============================================================
 
 ax_rate.set_xticks(
 
@@ -576,11 +404,6 @@ ax_rate.set_xticks(
     ]
 
 )
-
-
-# ============================================================
-# TITLE
-# ============================================================
 
 fig.suptitle(
 
@@ -597,11 +420,6 @@ fig.suptitle(
 
 )
 
-
-# ============================================================
-# FINALIZE FIGURE
-# ============================================================
-
 plt.tight_layout(
 
     rect=[
@@ -613,11 +431,6 @@ plt.tight_layout(
 
 )
 
-
-# ============================================================
-# SAVE FIGURE
-# ============================================================
-
 plt.savefig(
 
     FIGURE_FILE,
@@ -628,16 +441,10 @@ plt.savefig(
 
 )
 
-
 print("\nFIGURE SAVED TO:")
 
 print(
     FIGURE_FILE
 )
-
-
-# ============================================================
-# SHOW FIGURE
-# ============================================================
 
 plt.show()
