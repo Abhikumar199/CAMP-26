@@ -1,6 +1,5 @@
 
 
-
 from pathlib import Path
 import csv
 
@@ -13,8 +12,6 @@ from network import (
 )
 
 from simulator import run_simulation
-
-
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
@@ -29,25 +26,17 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 )
 
-
 SUMMARY_FILE = (
     RESULTS_DIR
     / "summary_firing_rate_vs_clustering.csv"
 )
-
 
 FIGURE_FILE = (
     RESULTS_DIR
     / "firing_rate_vs_clustering_curve.png"
 )
 
-
-
-
 N = 1000
-
-
-
 
 P_VALUES = [
 
@@ -71,15 +60,7 @@ P_VALUES = [
 
 ]
 
-
-
-# Start with 3 for testing.
-# Later use 10 or 20.
-
 NUM_REALIZATIONS = 3
-
-
-
 
 I_EXT = 0.85
 
@@ -89,8 +70,6 @@ TAU_M = 10.0
 
 TAU_D = 1.0
 
-
-
 DT = 0.01
 
 T_MAX = 2000.0
@@ -99,11 +78,6 @@ STIMULUS_TIME = 10.0
 
 STIMULUS_NEURON = N // 2
 
-
-# ============================================================
-# CLUSTERING COEFFICIENT
-# ============================================================
-
 def calculate_clustering_coefficient(
     outgoing_connections,
 ):
@@ -111,11 +85,6 @@ def calculate_clustering_coefficient(
     number_of_nodes = len(
         outgoing_connections
     )
-
-
-    # ========================================================
-    # CREATE UNDIRECTED NEIGHBOR SETS
-    # ========================================================
 
     neighbors = [
 
@@ -127,7 +96,6 @@ def calculate_clustering_coefficient(
 
     ]
 
-
     for i in range(
         number_of_nodes
     ):
@@ -138,60 +106,37 @@ def calculate_clustering_coefficient(
 
                 continue
 
-
             neighbors[i].add(j)
 
             neighbors[j].add(i)
 
-
-    # ========================================================
-    # CALCULATE C_i FOR EVERY NEURON
-    # ========================================================
-
     local_coefficients = []
-
 
     for i in range(
         number_of_nodes
     ):
 
-
         node_neighbors = list(
             neighbors[i]
         )
-
-
-        # --------------------------------------------
-        # k_i = degree of neuron i
-        # --------------------------------------------
 
         k_i = len(
             node_neighbors
         )
 
-
         if k_i < 2:
 
             C_i = 0.0
 
-
         else:
 
-
-            # ----------------------------------------
-            # e_i = number of connections among
-            #       neighbors of neuron i
-            # ----------------------------------------
-
             e_i = 0
-
 
             for a in range(
                 k_i
             ):
 
                 u = node_neighbors[a]
-
 
                 for b in range(
                     a + 1,
@@ -200,19 +145,9 @@ def calculate_clustering_coefficient(
 
                     v = node_neighbors[b]
 
-
                     if v in neighbors[u]:
 
                         e_i += 1
-
-
-            # ----------------------------------------
-            # CLUSTERING FORMULA
-            #
-            #          2 e_i
-            # C_i = ------------
-            #        k_i(k_i-1)
-            # ----------------------------------------
 
             C_i = (
 
@@ -228,9 +163,6 @@ def calculate_clustering_coefficient(
 
             )
 
-
-        # Numerical safety check
-
         if not (
             0.0
             <= C_i
@@ -244,19 +176,9 @@ def calculate_clustering_coefficient(
 
             )
 
-
         local_coefficients.append(
             C_i
         )
-
-
-    # ========================================================
-    # WHOLE-NETWORK CLUSTERING
-    #
-    #          1
-    # C = --------- sum C_i
-    #          N
-    # ========================================================
 
     C = float(
 
@@ -265,9 +187,6 @@ def calculate_clustering_coefficient(
         )
 
     )
-
-
-    # Final mathematical check
 
     if not (
         0.0
@@ -282,18 +201,11 @@ def calculate_clustering_coefficient(
 
         )
 
-
     return C
-
-
-# ============================================================
-# WHOLE-NETWORK MEAN FIRING RATE
-# ============================================================
 
 def calculate_mean_firing_rate(
     spike_times,
 ):
-
 
     spike_times = np.asarray(
 
@@ -303,9 +215,6 @@ def calculate_mean_firing_rate(
 
     )
 
-
-    # Only analyse activity after stimulus
-
     analysis_spikes = spike_times[
 
         spike_times
@@ -313,22 +222,12 @@ def calculate_mean_firing_rate(
 
     ]
 
-
     analysis_duration = (
 
         T_MAX
         - STIMULUS_TIME
 
     )
-
-
-    # --------------------------------------------------------
-    # WHOLE-NETWORK NORMALIZED FIRING RATE
-    #
-    #              total spikes
-    # r = --------------------------------
-    #       N × post-stimulus duration
-    # --------------------------------------------------------
 
     firing_rate = (
 
@@ -345,18 +244,11 @@ def calculate_mean_firing_rate(
 
     )
 
-
     return float(
         firing_rate
     )
 
-
-# ============================================================
-# MAIN
-# ============================================================
-
 def main():
-
 
     print("=" * 90)
 
@@ -366,28 +258,19 @@ def main():
 
     print("=" * 90)
 
-
     print(
         "\nFixed N =",
         N,
     )
-
 
     print(
         "Realizations per p =",
         NUM_REALIZATIONS,
     )
 
-
     summary_results = []
 
-
-    # ========================================================
-    # LOOP OVER SHORTCUT DENSITY p
-    # ========================================================
-
     for p in P_VALUES:
-
 
         print("\n")
 
@@ -399,20 +282,13 @@ def main():
 
         print("=" * 90)
 
-
         clustering_values = []
 
         firing_rate_values = []
 
-
-        # ====================================================
-        # RANDOM NETWORK REALIZATIONS
-        # ====================================================
-
         for realization in range(
             NUM_REALIZATIONS
         ):
-
 
             seed = (
 
@@ -428,11 +304,6 @@ def main():
 
             )
 
-
-            # ================================================
-            # BUILD NETWORK
-            # ================================================
-
             local_network = (
 
                 build_ring_network(
@@ -440,7 +311,6 @@ def main():
                 )
 
             )
-
 
             network, shortcuts = (
 
@@ -457,11 +327,6 @@ def main():
 
             )
 
-
-            # ================================================
-            # CALCULATE CLUSTERING COEFFICIENT
-            # ================================================
-
             C = (
 
                 calculate_clustering_coefficient(
@@ -470,15 +335,9 @@ def main():
 
             )
 
-
             clustering_values.append(
                 C
             )
-
-
-            # ================================================
-            # RUN SIMULATION
-            # ================================================
 
             spike_times, spike_neurons = (
 
@@ -515,11 +374,6 @@ def main():
 
             )
 
-
-            # ================================================
-            # CALCULATE FIRING RATE
-            # ================================================
-
             firing_rate = (
 
                 calculate_mean_firing_rate(
@@ -528,11 +382,9 @@ def main():
 
             )
 
-
             firing_rate_values.append(
                 firing_rate
             )
-
 
             print(
 
@@ -546,11 +398,6 @@ def main():
 
             )
 
-
-        # ====================================================
-        # CALCULATE MEAN AND SD FOR THIS p
-        # ====================================================
-
         clustering_values = np.asarray(
 
             clustering_values,
@@ -558,7 +405,6 @@ def main():
             dtype=float,
 
         )
-
 
         firing_rate_values = np.asarray(
 
@@ -568,7 +414,6 @@ def main():
 
         )
 
-
         mean_C = float(
 
             np.mean(
@@ -576,7 +421,6 @@ def main():
             )
 
         )
-
 
         std_C = float(
 
@@ -587,7 +431,6 @@ def main():
 
         ) if NUM_REALIZATIONS > 1 else 0.0
 
-
         mean_firing_rate = float(
 
             np.mean(
@@ -595,7 +438,6 @@ def main():
             )
 
         )
-
 
         std_firing_rate = float(
 
@@ -605,7 +447,6 @@ def main():
             )
 
         ) if NUM_REALIZATIONS > 1 else 0.0
-
 
         summary_results.append({
 
@@ -626,11 +467,9 @@ def main():
 
         })
 
-
         print("\nSUMMARY FOR THIS p")
 
         print("-" * 90)
-
 
         print(
 
@@ -645,11 +484,6 @@ def main():
 
         )
 
-
-    # ========================================================
-    # SAVE SUMMARY CSV
-    # ========================================================
-
     with open(
 
         SUMMARY_FILE,
@@ -659,7 +493,6 @@ def main():
         newline="",
 
     ) as file:
-
 
         fieldnames = [
 
@@ -675,7 +508,6 @@ def main():
 
         ]
 
-
         writer = csv.DictWriter(
 
             file,
@@ -684,18 +516,11 @@ def main():
 
         )
 
-
         writer.writeheader()
-
 
         writer.writerows(
             summary_results
         )
-
-
-    # ========================================================
-    # PRINT FINAL CLUSTERING TABLE
-    # ========================================================
 
     print("\n")
 
@@ -706,7 +531,6 @@ def main():
     )
 
     print("=" * 90)
-
 
     print(
 
@@ -720,12 +544,9 @@ def main():
 
     )
 
-
     print("-" * 90)
 
-
     for row in summary_results:
-
 
         print(
 
@@ -739,11 +560,6 @@ def main():
 
         )
 
-
-    # ========================================================
-    # PREPARE CURVE DATA
-    # ========================================================
-
     C_plot = np.asarray([
 
         row["mean_clustering"]
@@ -751,7 +567,6 @@ def main():
         for row in summary_results
 
     ])
-
 
     firing_plot = np.asarray([
 
@@ -761,7 +576,6 @@ def main():
 
     ])
 
-
     firing_std = np.asarray([
 
         row["std_firing_rate"]
@@ -770,42 +584,25 @@ def main():
 
     ])
 
-
-    # ========================================================
-    # SORT BY CLUSTERING COEFFICIENT
-    # ========================================================
-
-    # This is important because the x-axis is C,
-    # not p.
-
     sort_order = np.argsort(
         C_plot
     )
-
 
     C_plot = C_plot[
         sort_order
     ]
 
-
     firing_plot = firing_plot[
         sort_order
     ]
-
 
     firing_std = firing_std[
         sort_order
     ]
 
-
-    # ========================================================
-    # CREATE CURVE
-    # ========================================================
-
     plt.figure(
         figsize=(10, 7)
     )
-
 
     plt.plot(
 
@@ -824,11 +621,6 @@ def main():
         ),
 
     )
-
-
-    # ========================================================
-    # SHOW VARIABILITY
-    # ========================================================
 
     plt.fill_between(
 
@@ -849,11 +641,6 @@ def main():
 
     )
 
-
-    # ========================================================
-    # LABEL EVERY POINT WITH ITS p VALUE
-    # ========================================================
-
     sorted_rows = [
 
         summary_results[i]
@@ -861,7 +648,6 @@ def main():
         for i in sort_order
 
     ]
-
 
     for x, y, row in zip(
 
@@ -872,7 +658,6 @@ def main():
         sorted_rows,
 
     ):
-
 
         plt.annotate(
 
@@ -895,11 +680,6 @@ def main():
 
         )
 
-
-    # ========================================================
-    # AXES
-    # ========================================================
-
     plt.xlabel(
 
         "Mean clustering coefficient, C",
@@ -908,7 +688,6 @@ def main():
 
     )
 
-
     plt.ylabel(
 
         "Mean whole-network firing rate",
@@ -916,7 +695,6 @@ def main():
         fontsize=13,
 
     )
-
 
     plt.title(
 
@@ -928,37 +706,24 @@ def main():
 
     )
 
-
-    # Clustering coefficient is mathematically
-    # bounded between 0 and 1.
-
     plt.xlim(
         0,
         1,
     )
 
-
     plt.ylim(
         bottom=0,
     )
-
 
     plt.grid(
         alpha=0.3
     )
 
-
     plt.legend(
         fontsize=10
     )
 
-
     plt.tight_layout()
-
-
-    # ========================================================
-    # SAVE
-    # ========================================================
 
     plt.savefig(
 
@@ -970,9 +735,7 @@ def main():
 
     )
 
-
     plt.show()
-
 
     print("\n")
 
@@ -984,7 +747,6 @@ def main():
 
     print("=" * 90)
 
-
     print(
         "\nSummary CSV:"
     )
@@ -993,7 +755,6 @@ def main():
         SUMMARY_FILE
     )
 
-
     print(
         "\nFigure:"
     )
@@ -1001,11 +762,6 @@ def main():
     print(
         FIGURE_FILE
     )
-
-
-# ============================================================
-# WINDOWS ENTRY POINT
-# ============================================================
 
 if __name__ == "__main__":
     main()
