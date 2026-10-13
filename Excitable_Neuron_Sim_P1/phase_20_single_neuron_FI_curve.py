@@ -5,14 +5,9 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-
-
 from phase_1_neuron_characterization import (
     simulate_neuron,
 )
-
-
 
 PROJECT_DIR = Path(__file__).resolve().parent
 
@@ -27,14 +22,10 @@ RESULTS_DIR.mkdir(
     exist_ok=True,
 )
 
-
 FIGURE_FILE = (
     RESULTS_DIR
     / "single_neuron_FI_curve.png"
 )
-
-
-
 
 I_VALUES = np.linspace(
     0.0,
@@ -42,11 +33,7 @@ I_VALUES = np.linspace(
     101,
 )
 
-
-
-
 def main():
-
 
     print("=" * 80)
 
@@ -56,15 +43,9 @@ def main():
 
     print("=" * 80)
 
-
     firing_rates = []
 
-
-
-
     for I_ext in I_VALUES:
-
-
 
         times, voltage, spike_times = simulate_neuron(
 
@@ -76,9 +57,6 @@ def main():
 
         )
 
-
-
-
         duration = (
 
             times[-1]
@@ -86,9 +64,6 @@ def main():
             - times[0]
 
         )
-
-
-
 
         firing_rate = (
 
@@ -98,11 +73,9 @@ def main():
 
         )
 
-
         firing_rates.append(
             firing_rate
         )
-
 
         print(
 
@@ -115,9 +88,6 @@ def main():
 
         )
 
-
-
-
     firing_rates = np.asarray(
 
         firing_rates,
@@ -126,13 +96,9 @@ def main():
 
     )
 
-
-
-
     plt.figure(
         figsize=(8, 6)
     )
-
 
     plt.plot(
 
@@ -144,36 +110,28 @@ def main():
 
     )
 
-
     plt.xlabel(
         "External current, $I_{ext}$"
     )
-
 
     plt.ylabel(
         "Firing rate"
     )
 
-
     plt.title(
         "Single-Neuron F-I Curve"
     )
-
 
     plt.xlim(
         I_VALUES[0],
         I_VALUES[-1],
     )
 
-
     plt.grid(
         alpha=0.25
     )
 
-
     plt.tight_layout()
-
-
 
     plt.savefig(
 
@@ -185,9 +143,7 @@ def main():
 
     )
 
-
     plt.show()
-
 
     print("\n")
 
@@ -198,8 +154,6 @@ def main():
     print(
         FIGURE_FILE
     )
-
-
 
 if __name__ == "__main__":
 
